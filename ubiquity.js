@@ -9,7 +9,7 @@ Original Ubiquity Project: http://labs.mozilla.org/ubiquity/
 
 To use this in Opera, you have to:
 
-- Enable UserJS. Point your browser to opera:config#Javascript and:
+* Enable UserJS. Point your browser to opera:config#Javascript and:
 
   - tick "User Javascript" checkbox
   - type the folder you want to run the scripts from
@@ -18,7 +18,7 @@ To use this in Opera, you have to:
   If you want, you can also allow UserJS execution in
   HTTPS pages.
 
-- Remove the default shortcut key bound to CTRL + SPACE,
+* Remove the default shortcut key bound to CTRL + SPACE,
   since the original Ubiquity is activated and deactivated
   with CTRL + SPACE.
 
@@ -62,6 +62,7 @@ var ubiq_commands = new Array (
     'translate-no',
     //'twitter',   *** Non functional, due to security restrictions. I have an idea... 
     'weather',
+    'wikipedia',
     'yahoo-answers',
     'yahoo-search',
     'youtube'
@@ -98,6 +99,7 @@ var ubiq_commands_tip = new Array (
     'Translates the given words (or text selection, or the current window) from Norwegian to English',
     //'Update your twitter status',
     'Shows the weather forecast for',
+    'Searches Wikipedia',
     'Searches Yahoo Answers for',
     'Searches Yahoo for',
     'Searches for videos on Youtube'
@@ -133,6 +135,7 @@ var ubiq_commands_icon = new Array (
     'http://www.google.com/favicon.ico',
     //'http://www.twitter.com/favicon.ico',
     'http://www.accuweather.com/favicon.ico',
+    'http://en.wikipedia.org/favicon.ico',
     'http://l.yimg.com/a/i/us/sch/gr/answers_favicon.ico',
     'http://www.yahoo.com/favicon.ico',
     'http://www.youtube.com/favicon.ico'
@@ -300,6 +303,9 @@ function ubiq_dispatch_command(line) {
     }
     else if (cmd=='weather') {
         ubiq_cmd_url_based('http://www.wunderground.com/cgi-bin/findweather/getForecast?query='+escape(text));
+    }
+    else if (cmd=='wikipedia') {
+        ubiq_cmd_url_based('http://en.wikipedia.org/wiki/Special:Search?search='+escape(text));
     }
     else if (cmd=='h' || cmd=='help') {
         ubiq_display_results(ubiq_help());
