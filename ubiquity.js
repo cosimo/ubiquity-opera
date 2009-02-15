@@ -1,4 +1,34 @@
-// Ubiquity for Opera? A nightly experiment...
+/*
+Ubiquity for Opera? A nightly experiment...
+----------------------------------------------
+
+An attempt to rewrite Firefox's Ubiquity extension
+for Opera using UserJS.
+
+Original Ubiquity Project: http://labs.mozilla.org/ubiquity/
+
+To use this in Opera, you have to:
+
+- Enable UserJS. Point your browser to opera:config#Javascript and:
+
+  - tick "User Javascript" checkbox
+  - type the folder you want to run the scripts from
+    in the "User Javascript File" textfield
+
+  If you want, you can also allow UserJS execution in
+  HTTPS pages.
+
+- Remove the default shortcut key bound to CTRL + SPACE,
+  since the original Ubiquity is activated and deactivated
+  with CTRL + SPACE.
+
+Have fun!
+
+----------------------------------------------
+Cosimo Streppone, <cosimo@opera.com>
+First version: 19/01/2009
+*/
+
 // $Id$
 
 var ubiq_commands = new Array (
