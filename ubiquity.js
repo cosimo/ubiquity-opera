@@ -1,10 +1,5 @@
-/*
-	Ubiquity for Opera? A nightly experiment...
-	First version: Cosimo 17/01/2009
-
-	$Id$
-
-*/
+// Ubiquity for Opera? A nightly experiment...
+// $Id$
 
 var ubiq_commands = new Array (
     'amazon-search',
@@ -41,6 +36,7 @@ var ubiq_commands = new Array (
     'yahoo-search',
     'youtube'
 );
+
 var ubiq_commands_tip = new Array (
     'Searches Amazon for books matching:',
     'Searches Answers.com for',
@@ -76,6 +72,7 @@ var ubiq_commands_tip = new Array (
     'Searches Yahoo for',
     'Searches for videos on Youtube'
 );
+
 var ubiq_commands_icon = new Array (
     'http://www.amazon.com/favicon.ico',
     'http://www.answers.com/favicon.ico',
@@ -295,6 +292,7 @@ function ubiq_cmd_twitter_status(text) {
 }
 
 // Fire and forget POST request
+// XXX This will never work, due to security restrictions, unless...
 function ubiq_post_request (url, params) {
     var req=new XMLHttpRequest();
     req.open('POST',url,true);
@@ -506,20 +504,16 @@ function ubiq_key_handler (userjs_event) {
 			ubiq_toggle_window(ubiq_window);
 			return;
 		}
-
         // On ENTER, execute the given command
 		if (kc==13) {
             ubiq_execute();
             return;
         }
-
         ubiq_show_matching_commands();
 	}
-
 }
 
 /* Add event handler to window */
 window.opera.addEventListener('afterEvent.keyup', ubiq_key_handler, false);
 
 // vim: ts=4 sw=4 tw=0 et
-
