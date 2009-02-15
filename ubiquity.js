@@ -52,6 +52,7 @@ var ubiq_commands = new Array (
     'msn-search',
     'myopera-blogs',
     'myopera-photos',
+    'new-tab',
     'opera-config',
     'opera-cache',
     //'opera-bugs',
@@ -89,6 +90,7 @@ var ubiq_commands_tip = new Array (
     'Searches MSN for the given words',
     'Searches for blogs on the My Opera Community',
     'Searches for photos on the My Opera Community',
+    'Opens a new tab (or window) with the specified URL',
     'Shows your Opera browser preferences (filtered by given words)',
     'Shows your Opera browser cache contents',
     'Print current page',
@@ -126,6 +128,7 @@ var ubiq_commands_icon = new Array (
     'http://www.live.com/favicon.ico',
     'http://my.opera.com/favicon.ico',
     'http://my.opera.com/favicon.ico',
+    '',
     'http://www.opera.com/favicon.ico',
     'http://www.opera.com/favicon.ico',
     '',
@@ -278,6 +281,12 @@ function ubiq_dispatch_command(line) {
     }
     else if (cmd=='myopera-photos') {
         ubiq_cmd_url_based('http://my.opera.com/community/photos/?search='+escape(text));
+    }
+    else if (cmd=='new-tab') {
+        ubiq_toggle_window(ubiq_window);
+        // Open a new tab with URL = text
+        if (! text) text='about:';
+        window.open(text);
     }
     else if (cmd=='opera-config') {
         ubiq_cmd_url_based('opera:config#' + escape(text));

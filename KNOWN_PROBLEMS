@@ -15,3 +15,8 @@ $Id$
 
 * Current css style of elements in the ubiquity window
   is influenced by css of the underlying page.
+
+* If there's more commands than the current window
+  can display, they are now truncated, there's no
+  possibility to scroll down...
+
