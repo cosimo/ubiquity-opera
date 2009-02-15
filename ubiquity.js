@@ -17,23 +17,33 @@ var ubiq_commands = new Array (
     'define',
     'ebay-search',
     'flickr',
-    'gcalculate',
     'google',
+    'gcalculate',
     'help',
     'image-search',
+    'imdb',
+    'lastfm',
     'map',
+    'msn-search',
+    'myopera-blogs',
+    'myopera-photos',
+    'opera-config',
+    'opera-cache',
     //'opera-bugs',
     'print',
     'refresh',
     'search',
+    'skin-list',
     'translate-no',
+    //'twitter',   *** Non functional, due to security restrictions. I have an idea... 
     'weather',
+    'yahoo-answers',
     'yahoo-search',
     'youtube'
 );
 var ubiq_commands_tip = new Array (
     'Searches Amazon for books matching:',
-    'Searches Answers.com for:',
+    'Searches Answers.com for',
     'Searches Ask.com for the given words',
     'Go back 1 step in history',
     'Perform a bugzilla search for',
@@ -42,20 +52,65 @@ var ubiq_commands_tip = new Array (
     'Gives the definition of a word',
     'Searches EBay for the given words',
     'Searches for photos on Flickr',
-    'Examples: 3^4/sqrt(2)-pi,  3 inch in cm,  speed of light,  0xAF in decimal (<a href="http://www.googleguide.com/calculator.html">Command list</a>)',
     'Searches Google for your words',
+    'Examples: 3^4/sqrt(2)-pi,  3 inch in cm,  speed of light,  0xAF in decimal (<a href="http://www.googleguide.com/calculator.html">Command list</a>)',
     'Provides basic help on using Ubiquity for Opera',
     'Search on Google Images',
+    'Searches for movies on imdb',
+    'Listen to some artist radio on Last.fm',
     'Shows a location on the map',
+    'Searches MSN for the given words',
+    'Searches for blogs on the My Opera Community',
+    'Searches for photos on the My Opera Community',
+    'Shows your Opera browser preferences (filtered by given words)',
+    'Shows your Opera browser cache contents',
     'Print current page',
     //'Search in the Opera bug tracking database for',
     'Refreshes current document',
-    'Search using Google for:',
+    'Search using Google for',
+    'Browse or search Opera skins on my.opera.com',
     'Translates the given words (or text selection, or the current window) from Norwegian to English',
-    'Shows the weather forecast for:',
-    'Searches Yahoo for:',
+    //'Update your twitter status',
+    'Shows the weather forecast for',
+    'Searches Yahoo Answers for',
+    'Searches Yahoo for',
     'Searches for videos on Youtube'
 );
+var ubiq_commands_icon = new Array (
+    'http://www.amazon.com/favicon.ico',
+    'http://www.answers.com/favicon.ico',
+    'http://www.ask.com/favicon.ico',
+    '',
+    'http://www.mozilla.org/favicon.ico',
+    '',
+    '', // Command list?
+    'http://www.answers.com/favicon.ico',
+    'http://ebay.com/favicon.ico',
+    'http://flickr.com/favicon.ico',
+    'http://www.google.com/favicon.ico',
+    '', // Calculator?
+    'http://upload.wikimedia.org/wikipedia/commons/4/44/Help-browser.svg',
+    'http://www.google.com/favicon.ico',
+    'http://www.imdb.com/favicon.ico',
+    'http://lastfm.com/favicon.ico',
+    'http://www.google.com/favicon.ico', // Maps
+    'http://www.live.com/favicon.ico',
+    'http://my.opera.com/favicon.ico',
+    'http://my.opera.com/favicon.ico',
+    'http://www.opera.com/favicon.ico',
+    'http://www.opera.com/favicon.ico',
+    '',
+    '',
+    'http://www.google.com/favicon.ico',
+    'http://my.opera.com/favicon.ico',
+    'http://www.google.com/favicon.ico',
+    //'http://www.twitter.com/favicon.ico',
+    'http://www.accuweather.com/favicon.ico',
+    'http://l.yimg.com/a/i/us/sch/gr/answers_favicon.ico',
+    'http://www.yahoo.com/favicon.ico',
+    'http://www.youtube.com/favicon.ico'
+);
+
 var ubiq_window;
 var ubiq_selection;
 var ubiq_element;
@@ -128,8 +183,8 @@ function ubiq_dispatch_command(line) {
     if (ubiq_selection) {
         text = ubiq_selection;
     } else {
-        words[0] = '';
-        text= words.join(' ');
+        words.shift();
+        text=words.join(' ');
     }
 
     // Expand match (typing 'go' will expand to 'google')
@@ -167,17 +222,38 @@ function ubiq_dispatch_command(line) {
     else if (cmd=='flickr') {
         ubiq_cmd_url_based('http://www.flickr.com/search/?q='+escape(text)+'&w=all');
     }
-    else if (cmd=='image-search') {
-        ubiq_cmd_url_based('http://images.google.com/images?hl=en&q='+escape(text)+'&client=opera&sourceid=opera');
-    }
     else if (cmd=='gcalculate') {
         ubiq_cmd_url_based('http://www.google.com/search?client=opera&num=1&q='+escape(text)+'&sourceid=opera&ie=utf-8&oe=utf-8');
     }
     else if (cmd=='google' || cmd=='search') {
         ubiq_cmd_url_based('http://www.google.com/search?client=opera&q='+escape(text)+'&sourceid=opera&ie=utf-8&oe=utf-8');
     }
+    else if (cmd=='image-search') {
+        ubiq_cmd_url_based('http://images.google.com/images?hl=en&q='+escape(text)+'&client=opera&sourceid=opera');
+    }
+    else if (cmd=='imdb') {
+        ubiq_cmd_url_based('http://www.imdb.com/find?s=all&q='+escape(text)+'&x=0&y=0');
+    }
+    else if (cmd=='lastfm') {
+        ubiq_cmd_url_based('http://www.lastfm.com/listen/artist/'+escape(text)+'/similarartists');
+    }
     else if (cmd=='map') {
         ubiq_cmd_url_based('http://maps.google.com/maps?q='+escape(text));
+    }
+    else if (cmd=='msn-search') {
+        ubiq_cmd_url_based('http://search.msn.com/results.aspx?q='+escape(text));
+    }
+    else if (cmd=='myopera-blogs') {
+        ubiq_cmd_url_based('http://my.opera.com/community/blogs/?search='+escape(text));
+    }
+    else if (cmd=='myopera-photos') {
+        ubiq_cmd_url_based('http://my.opera.com/community/photos/?search='+escape(text));
+    }
+    else if (cmd=='opera-config') {
+        ubiq_cmd_url_based('opera:config#' + escape(text));
+    }
+    else if (cmd=='opera-cache') {
+        ubiq_cmd_url_based('opera:cache');
     }
     else if (cmd=='print') {
         ubiq_toggle_window(ubiq_window);
@@ -185,6 +261,15 @@ function ubiq_dispatch_command(line) {
     }
     else if (cmd=='refresh') {
         ubiq_cmd_refresh();
+    }
+    else if (cmd=='skin-list') {
+        ubiq_cmd_url_based('http://my.opera.com/community/customize/skins/?search=' + escape(text));
+    }
+    else if (cmd=='twitter') {
+        ubiq_cmd_twitter_status(text);
+    }
+    else if (cmd=='yahoo-search') {
+        ubiq_cmd_url_based('http://search.yahoo.com/search?p='+escape(text)+'&ei=UTF-8');
     }
     else if (cmd=='weather') {
         ubiq_cmd_url_based('http://www.wunderground.com/cgi-bin/findweather/getForecast?query='+escape(text));
@@ -202,6 +287,23 @@ function ubiq_dispatch_command(line) {
     return;
 }
 
+function ubiq_cmd_twitter_status(text) {
+    ubiq_toggle_window(ubiq_window);
+    var endpoint = 'http://twitter.com/statuses/update.json';
+    ubiq_post_request(endpoint, 'status='+escape(text)+'&app=myopera');
+    return;
+}
+
+// Fire and forget POST request
+function ubiq_post_request (url, params) {
+    var req=new XMLHttpRequest();
+    req.open('POST',url,true);
+    req.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+    req.setRequestHeader('Content-length', params.length);
+    req.setRequestHeader('Connection', 'close');
+    req.send(params);
+}
+
 function ubiq_cmd_url_based (url) {
     ubiq_toggle_window(ubiq_window);
     ubiq_new_window(url);
@@ -216,7 +318,7 @@ function ubiq_display_results (text) {
 }
 
 function ubiq_help () {
-    var style = 'font-size:17px; padding:8px; font-weight:0';
+    var style = 'font-size:17px; padding:8px; font-weight:normal';
     var html = '<p style="' + style + '">Type the name of a command and press enter to execute it, or <b>help</b> for assistance.</p>';
     return html;
 }
@@ -319,22 +421,31 @@ function ubiq_show_matching_commands (text) {
     if (text.length > 0) {
         for (var c in ubiq_commands) {
             var tip = ' <span style="color: #ddd; font-family:Helvetica,Arial;font-style:italic;font-size:14px;">' + ubiq_commands_tip[c] + '</span>';
+            var icon = ubiq_commands_icon[c];
+            if (icon) icon = 'src="' + icon + '" ';
+            icon = '<img '+ icon + ' width="16" height="16" border="0" align="absbottom"> ';
             c = ubiq_commands[c];
             // Starting match only /^command/
             if (show_all || c.match('^' + text)) {
-                matches.push(c + ' &rarr; ' + tip);
+                matches.push(icon + c + ' &rarr; ' + tip);
             }
             // Substring matching as well, in a separate list
             else if (c.match(text)) {
-                substr_matches.push(c + ' &rarr; ' + tip);
+                substr_matches.push(icon + c + ' &rarr; ' + tip);
             }
         }
     }
 
     // Some substring matches found, append to list of matches
     if (substr_matches.length > 0) {
+        var full_matches = matches.length;
         for (m in substr_matches) {
             matches.push(substr_matches[m]);
+            // Too long lists overflow from the layer
+            if ((parseInt(m) + full_matches) > 11) {
+                matches.push('...');
+                break;
+            }
         }
     }
 
@@ -353,7 +464,7 @@ function ubiq_show_matching_commands (text) {
             //var li_bg=ubiq_url_for(c==0 ? 'selected_background.png' : 'command_background.png');
             var li_bg=ubiq_url_for('command_background.png');
             li.innerHTML=matches[c];
-            li.style = 'color: black; list-style: none; margin:0; padding-top:8px; padding-left:24px;'
+            li.style = 'color: black; list-style: none; margin:0; padding-top:8px; padding-left:12px;'
                 + 'font-family: Helvetica,Arial; font-size: 14px; height:26px;'
                 + 'background-image:'+li_bg+'; background-repeat: no-repeat;';
             suggestions_list.appendChild(li);
@@ -379,9 +490,9 @@ function ubiq_key_handler (userjs_event) {
     // Otherwise, activate only on CTRL + Space
 	if (! ubiq_enabled()) {
     	// Create our window if not already done 
-		if (! ubiq_window)
+		if (! ubiq_window) {
 			ubiq_window = ubiq_create_window();
-
+        }
 		if (ctrl_space_pressed) {
     		// Get text selection before switching window focus
 			ubiq_get_selection();
