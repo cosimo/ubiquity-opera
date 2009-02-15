@@ -1,0 +1,15 @@
+$Id$
+
+* Due to limitations of UserJS, I can't access
+  Opera preferences and search engines, so I can't
+  autogenerate the searches commands for all your
+  user-defined search engines
+
+* The "ubiquity" window is attached to each document.
+  I don't know of a way to attach it to the browsers chrome.
+  This leads to multiple ubiquity windows, one for each
+  document, that don't share their state
+
+* It's not possible to load scripts or JSON content
+  from other sites, due to XSS restrictions
+
