@@ -13,3 +13,5 @@ $Id$
 * It's not possible to load scripts or JSON content
   from other sites, due to XSS restrictions
 
+* Current css style of elements in the ubiquity window
+  is influenced by css of the underlying page.
