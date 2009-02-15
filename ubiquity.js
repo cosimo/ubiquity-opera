@@ -14,17 +14,22 @@ var ubiq_commands = new Array (
     'bugzilla',
     'close',
     'command-list',
+    'define',
     'ebay-search',
+    'flickr',
     'gcalculate',
     'google',
     'help',
     'image-search',
     'map',
     //'opera-bugs',
+    'print',
     'refresh',
     'search',
     'translate-no',
-    'weather'
+    'weather',
+    'yahoo-search',
+    'youtube'
 );
 var ubiq_commands_tip = new Array (
     'Searches Amazon for books matching:',
@@ -34,17 +39,22 @@ var ubiq_commands_tip = new Array (
     'Perform a bugzilla search for',
     'Close the current window',
     'Shows the list of Ubiquity commands and what they do',
+    'Gives the definition of a word',
     'Searches EBay for the given words',
+    'Searches for photos on Flickr',
     'Examples: 3^4/sqrt(2)-pi,  3 inch in cm,  speed of light,  0xAF in decimal (<a href="http://www.googleguide.com/calculator.html">Command list</a>)',
     'Searches Google for your words',
     'Provides basic help on using Ubiquity for Opera',
     'Search on Google Images',
     'Shows a location on the map',
+    'Print current page',
     //'Search in the Opera bug tracking database for',
     'Refreshes current document',
     'Search using Google for:',
-    'Translates the given words from Norwegian to English',
-    'Shows the weather forecast for:'
+    'Translates the given words (or text selection, or the current window) from Norwegian to English',
+    'Shows the weather forecast for:',
+    'Searches Yahoo for:',
+    'Searches for videos on Youtube'
 );
 var ubiq_window;
 var ubiq_selection;
@@ -87,8 +97,8 @@ function ubiq_start_mode () {
            'border:0; padding:0; height:32px; margin-top:16px;'
          + 'margin-left:10px; background:none; color:black;'
          + 'font-family: Trebuchet MS, Arial, Helvetica; font-size: 28px;';
-    var div_style = 'width:100%; border:0; display:block; float:left; margin: 0px 5px 0px 5px;';
-	var results_panel_style = div_style + 'clear:both; text-align: left; padding-top: 8px; font-size: 19px; font-weight: normal; color:white; height: 502px;';
+    var div_style = 'width:100%; border:0; display:block; float:left; margin:0;';
+	var results_panel_style = div_style + 'clear:both; text-align: left; padding-top:2px; font-size: 19px; font-weight: normal; color:white; height: 502px;';
     var html =
           '<div id="ubiq-input-panel" style="' + div_style + 'height:55px">'
         + '<form id="ubiq1" onsubmit="return false">'
@@ -122,6 +132,9 @@ function ubiq_dispatch_command(line) {
         text= words.join(' ');
     }
 
+    // Expand match (typing 'go' will expand to 'google')
+    cmd = ubiq_match_first_command(cmd);
+
     if (cmd=='translate-no') { // TODO change this to generalize
         ubiq_cmd_translate_no(text);
     }
@@ -131,7 +144,7 @@ function ubiq_dispatch_command(line) {
     else if (cmd=='answers-search') {
         ubiq_cmd_url_based('http://www.answers.com/' + escape(text));
     }
-    else if (cmd=='ask-search') {
+    else if (cmd=='ask-search' || cmd=='define') {
         ubiq_cmd_url_based('http://www.ask.com/web?q=' + escape(text));
     }
     else if (cmd=='back') {
@@ -151,6 +164,9 @@ function ubiq_dispatch_command(line) {
     else if (cmd=='ebay-search') {
         ubiq_cmd_url_based('http://search.ebay.com/search/search.dll?satitle=' + escape(text));
     }
+    else if (cmd=='flickr') {
+        ubiq_cmd_url_based('http://www.flickr.com/search/?q='+escape(text)+'&w=all');
+    }
     else if (cmd=='image-search') {
         ubiq_cmd_url_based('http://images.google.com/images?hl=en&q='+escape(text)+'&client=opera&sourceid=opera');
     }
@@ -163,6 +179,10 @@ function ubiq_dispatch_command(line) {
     else if (cmd=='map') {
         ubiq_cmd_url_based('http://maps.google.com/maps?q='+escape(text));
     }
+    else if (cmd=='print') {
+        ubiq_toggle_window(ubiq_window);
+        window.print();
+    }
     else if (cmd=='refresh') {
         ubiq_cmd_refresh();
     }
@@ -171,6 +191,12 @@ function ubiq_dispatch_command(line) {
     }
     else if (cmd=='h' || cmd=='help') {
         ubiq_display_results(ubiq_help());
+    }
+    else if (cmd=='yahoo-search') {
+        ubiq_cmd_url_based('http://search.yahoo.com/search?p='+escape(text)+'&ei=UTF-8');
+    }
+    else if (cmd=='youtube') {
+        ubiq_cmd_url_based('http://www.youtube.com/results?search_type=search_videos&search_sort=relevance&search_query='+escape(text)+'&search=Search');
     }
 
     return;
@@ -190,7 +216,8 @@ function ubiq_display_results (text) {
 }
 
 function ubiq_help () {
-    var html = '<p>Type the name of a command and press enter to execute it, or <b>help</b> for assistance.</p>';
+    var style = 'font-size:17px; padding:8px; font-weight:0';
+    var html = '<p style="' + style + '">Type the name of a command and press enter to execute it, or <b>help</b> for assistance.</p>';
     return html;
 }
 
@@ -200,7 +227,13 @@ function ubiq_cmd_translate_no(text) {
     //alert(ubiq_element.innerHTML);
     //var html = ubiq_element.innerHTML.replace(text, 'blah blah blah');
     //ubiq_element.innerHTML = html;
-    ubiq_new_window('http://translate.google.com/translate_t?#no|en|'+text);
+    if (! text || text.length == 0 || text.match('^https?://')) {
+        if (! text) text = window.location.href;
+        url = 'http://translate.google.com/translate?prev=_t&ie=UTF-8&sl=no&tl=en&history_state0=&u=';
+    } else {
+        url = 'http://translate.google.com/translate_t?#no|en|';
+    }
+    ubiq_new_window(url + text);
 }
 
 function ubiq_cmd_refresh() {
@@ -262,16 +295,46 @@ function ubiq_get_current_element () {
     return (ubiq_element = el);
 }
 
-function ubiq_show_matching_commands (text) {
+function ubiq_match_first_command(text) {
     if (! text) text = ubiq_command();
-    var show_all = text == '*all';
-    var matches = new Array();
+    var first_match = '';
     if (text.length > 0) {
         for (var c in ubiq_commands) {
-            c = ubiq_commands[c] + ' <span style="font-family:Helvetica,Arial;font-style:italic;font-size:14px;">' + ubiq_commands_tip[c] + '</span>';
-            if (show_all || c.match('^' + text)) {
-                matches.push(c);
+            c = ubiq_commands[c];
+            if (c.match('^' + text)) {
+                first_match = c;
+                break;
             }
+        }
+    }
+    return first_match;
+}
+
+function ubiq_show_matching_commands (text) {
+    if (! text) text = ubiq_command();
+
+    var show_all = text == '*all';
+    var matches = new Array();
+    var substr_matches = new Array();
+    if (text.length > 0) {
+        for (var c in ubiq_commands) {
+            var tip = ' <span style="color: #ddd; font-family:Helvetica,Arial;font-style:italic;font-size:14px;">' + ubiq_commands_tip[c] + '</span>';
+            c = ubiq_commands[c];
+            // Starting match only /^command/
+            if (show_all || c.match('^' + text)) {
+                matches.push(c + ' &rarr; ' + tip);
+            }
+            // Substring matching as well, in a separate list
+            else if (c.match(text)) {
+                substr_matches.push(c + ' &rarr; ' + tip);
+            }
+        }
+    }
+
+    // Some substring matches found, append to list of matches
+    if (substr_matches.length > 0) {
+        for (m in substr_matches) {
+            matches.push(substr_matches[m]);
         }
     }
 
@@ -283,11 +346,16 @@ function ubiq_show_matching_commands (text) {
 
         var suggestions_div = document.createElement('div');
         var suggestions_list = document.createElement('ul');
+        suggestions_list.style = 'padding:0; margin:0';
 
         for (var c in matches) {
             var li=document.createElement('li');
+            //var li_bg=ubiq_url_for(c==0 ? 'selected_background.png' : 'command_background.png');
+            var li_bg=ubiq_url_for('command_background.png');
             li.innerHTML=matches[c];
-            li.style = 'list-style: none; padding:0; margin:0; font-family: monospace; font-size: 1.0em';
+            li.style = 'color: black; list-style: none; margin:0; padding-top:8px; padding-left:24px;'
+                + 'font-family: Helvetica,Arial; font-size: 14px; height:26px;'
+                + 'background-image:'+li_bg+'; background-repeat: no-repeat;';
             suggestions_list.appendChild(li);
         }
 
