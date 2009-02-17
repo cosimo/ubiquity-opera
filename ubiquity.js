@@ -319,6 +319,9 @@ function ubiq_dispatch_command(line) {
     else if (cmd=='h' || cmd=='help') {
         ubiq_display_results(ubiq_help());
     }
+    else if (cmd=='yahoo-answers') {
+        ubiq_cmd_url_based('http://answers.yahoo.com/search/search_result;_ylv=3?p='+escape(text));
+    }
     else if (cmd=='yahoo-search') {
         ubiq_cmd_url_based('http://search.yahoo.com/search?p='+escape(text)+'&ei=UTF-8');
     }
@@ -457,6 +460,9 @@ function ubiq_match_first_command(text) {
 
 function ubiq_show_matching_commands (text) {
     if (! text) text = ubiq_command();
+
+    // Always consider 1st word only
+    text = text.split(' ')[0];
 
     var show_all = text == '*all';
     var matches = new Array();
