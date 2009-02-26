@@ -316,7 +316,7 @@ function ubiq_dispatch_command(line) {
     else if (cmd=='wikipedia') {
         ubiq_cmd_url_based('http://en.wikipedia.org/wiki/Special:Search?search='+escape(text));
     }
-    else if (cmd=='h' || cmd=='help') {
+    else if (cmd=='help' || cmd=='about') {
         ubiq_display_results(ubiq_help());
     }
     else if (cmd=='yahoo-answers') {
@@ -510,8 +510,8 @@ function ubiq_show_matching_commands (text) {
 
         for (var c in matches) {
             var li=document.createElement('li');
-            //var li_bg=ubiq_url_for(c==0 ? 'selected_background.png' : 'command_background.png');
-            var li_bg=ubiq_url_for('command_background.png');
+            var li_bg=ubiq_url_for(c==0 ? 'selected_background.png' : 'command_background.png');
+            //var li_bg=ubiq_url_for('command_background.png');
             li.innerHTML=matches[c];
             li.style = 'color: black; list-style: none; margin:0; padding-top:8px; padding-left:12px;'
                 + 'font-family: Helvetica,Arial; font-size: 14px; height:26px;'
@@ -533,7 +533,9 @@ function ubiq_key_handler (userjs_event) {
     if (!userjs_event) return;
     var ev = userjs_event.event;
 	var kc = ev.keyCode;
-	var ctrl_space_pressed = kc == 32 && ev.ctrlKey;
+
+    // afterEvent.keyUp ctrlKey is always false on Opera 9.63 on Linux (?)
+	var ctrl_space_pressed = (kc==32) && (ev.ctrlKey || ev.metaKey);
 
     // If we're in the background (or not created), return immediately
     // Otherwise, activate only on CTRL + Space
