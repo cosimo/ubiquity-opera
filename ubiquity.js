@@ -40,6 +40,7 @@ var ubiq_commands = new Array (
     'close',
     'command-list',
     'define',
+    'dramatic-chipmunk',
     'ebay-search',
     'flickr',
     'google',
@@ -60,7 +61,7 @@ var ubiq_commands = new Array (
     'refresh',
     'search',
     'skin-list',
-    'translate-no',
+    'translate',
     //'twitter',   *** Non functional, due to security restrictions. I have an idea... 
     'weather',
     'wikipedia',
@@ -78,6 +79,7 @@ var ubiq_commands_tip = new Array (
     'Close the current window',
     'Shows the list of Ubiquity commands and what they do',
     'Gives the definition of a word',
+    'Prepare to a dramatic moment of your life',
     'Searches EBay for the given words',
     'Searches for photos on Flickr',
     'Searches Google for your words',
@@ -116,6 +118,7 @@ var ubiq_commands_icon = new Array (
     '',
     '', // Command list?
     'http://www.answers.com/favicon.ico',
+    'http://www.youtube.com/favicon.ico',
     'http://ebay.com/favicon.ico',
     'http://flickr.com/favicon.ico',
     'http://www.google.com/favicon.ico',
@@ -223,8 +226,8 @@ function ubiq_dispatch_command(line) {
     // Expand match (typing 'go' will expand to 'google')
     cmd = ubiq_match_first_command(cmd);
 
-    if (cmd=='translate-no') { // TODO change this to generalize
-        ubiq_cmd_translate_no(text);
+    if (cmd=='translate') { // TODO change this to generalize
+        ubiq_cmd_translate(text);
     }
     else if (cmd=='amazon-search') {
         ubiq_cmd_url_based('http://www.amazon.com/s/ref=nb_ss_gw?url=search-alias%3Dstripbooks&field-keywords=' + escape(text));
@@ -248,6 +251,9 @@ function ubiq_dispatch_command(line) {
     }
     else if (cmd=='command-list') {
         ubiq_show_matching_commands('*all');
+    }
+    else if (cmd=='dramatic-chipmunk') {
+        ubiq_cmd_url_based('http://www.youtube.com/watch?v=a1Y73sPHKxw');
     }
     else if (cmd=='ebay-search') {
         ubiq_cmd_url_based('http://search.ebay.com/search/search.dll?satitle=' + escape(text));
@@ -369,7 +375,7 @@ function ubiq_help () {
     return html;
 }
 
-function ubiq_cmd_translate_no(text) {
+function ubiq_cmd_translate (text) {
     ubiq_toggle_window(ubiq_window);
     // HARD !!!
     //alert(ubiq_element.innerHTML);
@@ -377,19 +383,19 @@ function ubiq_cmd_translate_no(text) {
     //ubiq_element.innerHTML = html;
     if (! text || text.length == 0 || text.match('^https?://')) {
         if (! text) text = window.location.href;
-        url = 'http://translate.google.com/translate?prev=_t&ie=UTF-8&sl=no&tl=en&history_state0=&u=';
+        url = 'http://translate.google.com/translate?prev=_t&ie=UTF-8&sl=auto&tl=auto&history_state0=&u=';
     } else {
-        url = 'http://translate.google.com/translate_t?#no|en|';
+        url = 'http://translate.google.com/translate_t?#auto|auto|';
     }
     ubiq_new_window(url + text);
 }
 
-function ubiq_cmd_refresh() {
+function ubiq_cmd_refresh () {
     ubiq_toggle_window(ubiq_window);
     document.location.reload();
 }
 
-function ubiq_new_window(url) {
+function ubiq_new_window (url) {
     window.open(url, 'ubiq_tab');
 }
 
