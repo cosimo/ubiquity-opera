@@ -30,6 +30,13 @@ First version: 19/01/2009
 */
 
 // $Id$
+;
+var ubiq_window;
+var ubiq_selection;
+var ubiq_element;
+var ubiq_remote_server = 'http://people.opera.com/cosimo/ubiquity';
+var ubiq_selected_command;
+var ubiq_first_match;
 
 var ubiq_commands = new Array (
     'amazon-search',
@@ -61,6 +68,7 @@ var ubiq_commands = new Array (
     'refresh',
     'search',
     'skin-list',
+    'stackoverflow-search',
     'translate',
     //'twitter',   *** Non functional, due to security restrictions. I have an idea... 
     'weather',
@@ -100,6 +108,7 @@ var ubiq_commands_tip = new Array (
     'Refreshes current document',
     'Search using Google for',
     'Browse or search Opera skins on my.opera.com',
+    'Searches questions and answers on stackoverflow.com',
     'Translates the given words (or text selection, or the current window) from Norwegian to English',
     //'Update your twitter status',
     'Shows the weather forecast for',
@@ -138,6 +147,7 @@ var ubiq_commands_icon = new Array (
     '',
     'http://www.google.com/favicon.ico',
     'http://my.opera.com/favicon.ico',
+    'http://stackoverflow.com/favicon.ico',
     'http://www.google.com/favicon.ico',
     //'http://www.twitter.com/favicon.ico',
     'http://www.accuweather.com/favicon.ico',
@@ -146,11 +156,6 @@ var ubiq_commands_icon = new Array (
     'http://www.yahoo.com/favicon.ico',
     'http://www.youtube.com/favicon.ico'
 );
-
-var ubiq_window;
-var ubiq_selection;
-var ubiq_element;
-var ubiq_remote_server = 'http://people.opera.com/cosimo/ubiquity';
 
 // Used to get css url of images and other resources
 function ubiq_url_for (path) {
@@ -188,20 +193,38 @@ function ubiq_start_mode () {
            'border:0; padding:0; height:32px; margin-top:16px;'
          + 'margin-left:10px; background:none; color:black;'
          + 'font-family: Trebuchet MS, Arial, Helvetica; font-size: 28px;';
-    var div_style = 'width:100%; border:0; display:block; float:left; margin:0;';
-	var results_panel_style = div_style + 'clear:both; text-align: left; padding-top:2px; font-size: 19px; font-weight: normal; color:white; height: 502px;';
+    var div_style = 'border:0; display:block; float:left; margin:0;';
+	var results_panel_style = div_style +
+          'clear:both; text-align: left; padding-top:2px; font-size: 19px; '
+        + 'font-weight: normal; color:white; height: 502px;';
+
     var html =
-          '<div id="ubiq-input-panel" style="' + div_style + 'height:55px">'
+          '<div id="ubiq-input-panel" style="' + div_style + ';width:99%;height:55px">'
         + '<form id="ubiq1" onsubmit="return false">'
-        + '<input id="ubiq_input" style="' + input_style +'" type="text" size="60" maxlength="500">'
+        + '<input autocomplete="off" id="ubiq_input" style="' + input_style +'" type="text" size="60" maxlength="500">'
         + '</form>'
         + '</div>'
         + '<br/>'
-        + '<div id="ubiq-results-panel" style="' + results_panel_style + '">'
+        + '<div id="ubiq-results-panel" style="width:100%;' + results_panel_style + '">'
 		+ ubiq_help()
-        + '</div>';
+        + '</div>'
+        + '<div id="ubiq-command-tip" style="position:absolute;left:310px;top:65px;display:block;border:0;color:#ddd;font-family:Helvetica,Arial;font-style:italic;font-size:11pt"></div>'
+        + '<div id="ubiq-command-preview" style="position:absolute;left:310px;top:85px;display:block;overflow:auto;border:0;color:#ddd;"></div>'
+        ;
     //html += '<' + 'script language="javascript">document.addEventListener("keydown",ubiq_active_key_handler,false);</script>';
     return html;
+}
+
+function ubiq_show_tip (tip) {
+    var el = document.getElementById('ubiq-command-tip');
+    if (! el) return;
+    if (! tip) {
+        el.innerHTML = '';
+        return;
+    }
+    tip = ubiq_commands_tip[tip];
+    el.innerHTML = tip;
+    return;
 }
 
 function ubiq_execute () {
@@ -225,11 +248,9 @@ function ubiq_dispatch_command(line) {
 
     // Expand match (typing 'go' will expand to 'google')
     cmd = ubiq_match_first_command(cmd);
+    ubiq_replace_first_word(cmd);
 
-    if (cmd=='translate') { // TODO change this to generalize
-        ubiq_cmd_translate(text);
-    }
-    else if (cmd=='amazon-search') {
+    if (cmd=='amazon-search') {
         ubiq_cmd_url_based('http://www.amazon.com/s/ref=nb_ss_gw?url=search-alias%3Dstripbooks&field-keywords=' + escape(text));
     }
     else if (cmd=='answers-search') {
@@ -310,6 +331,12 @@ function ubiq_dispatch_command(line) {
     else if (cmd=='skin-list') {
         ubiq_cmd_url_based('http://my.opera.com/community/customize/skins/?search=' + escape(text));
     }
+    else if (cmd=='stackoverflow-search') {
+        ubiq_cmd_url_based('http://stackoverflow.com/search?q=' + escape(text));
+    }
+    else if (cmd=='translate') {
+        ubiq_cmd_translate(text);
+    }
     else if (cmd=='twitter') {
         ubiq_cmd_twitter_status(text);
     }
@@ -364,7 +391,7 @@ function ubiq_cmd_url_based (url) {
 function ubiq_display_results (text) {
     var div=document.getElementById('ubiq-results-panel');
     if (! div) alert('no div!');
-    opera.postError('help text='+text);
+    //opera.postError('help text='+text);
     div.innerHTML = text;
     div.style.visibility='show';
 }
@@ -435,7 +462,10 @@ function ubiq_enabled () {
 
 function ubiq_command () {
     var cmd = document.getElementById('ubiq_input');
-    if (! cmd) return;
+    if (! cmd) {
+        ubiq_selected_command = -1;
+        return '';
+    }
     return cmd.value;
 }
 
@@ -452,6 +482,12 @@ function ubiq_get_current_element () {
 function ubiq_match_first_command(text) {
     if (! text) text = ubiq_command();
     var first_match = '';
+
+    // Command selected through cursor UP/DOWN
+    if (ubiq_first_match) {
+        return ubiq_first_match;
+    }
+
     if (text.length > 0) {
         for (var c in ubiq_commands) {
             c = ubiq_commands[c];
@@ -464,29 +500,49 @@ function ubiq_match_first_command(text) {
     return first_match;
 }
 
+function ubiq_command_icon(c) {
+    var icon = ubiq_commands_icon[c];
+    if (icon) icon = 'src="' + icon + '" ';
+    icon = '<img '+ icon + ' width="16" height="16" border="0" align="absbottom"> ';
+    return icon;
+}
+
+function ubiq_command_name(c) {
+    return ubiq_commands[c];
+}
+
+function ubiq_replace_first_word(w) {
+    if (!w) return;
+    var text = ubiq_command();
+    var words = text.split(' ');
+    words[0] = w;
+    var cmd_line = document.getElementById('ubiq_input');
+    if (! cmd_line) return;
+    cmd_line.value = words.join(' ');
+    return;
+}
+
 function ubiq_show_matching_commands (text) {
     if (! text) text = ubiq_command();
 
     // Always consider 1st word only
     text = text.split(' ')[0];
 
+    ubiq_first_match = null;
+
     var show_all = text == '*all';
     var matches = new Array();
     var substr_matches = new Array();
     if (text.length > 0) {
         for (var c in ubiq_commands) {
-            var tip = ' <span style="color: #ddd; font-family:Helvetica,Arial;font-style:italic;font-size:14px;">' + ubiq_commands_tip[c] + '</span>';
-            var icon = ubiq_commands_icon[c];
-            if (icon) icon = 'src="' + icon + '" ';
-            icon = '<img '+ icon + ' width="16" height="16" border="0" align="absbottom"> ';
-            c = ubiq_commands[c];
+            var cmd = ubiq_commands[c];
             // Starting match only /^command/
-            if (show_all || c.match('^' + text)) {
-                matches.push(icon + c + ' &rarr; ' + tip);
+            if (show_all || cmd.match('^' + text)) {
+                matches.push(c);
             }
             // Substring matching as well, in a separate list
-            else if (c.match(text)) {
-                substr_matches.push(icon + c + ' &rarr; ' + tip);
+            else if (cmd.match(text)) {
+                substr_matches.push(c);
             }
         }
     }
@@ -507,6 +563,11 @@ function ubiq_show_matching_commands (text) {
     // Where to show the results
     var results_panel = document.getElementById('ubiq-results-panel');
 
+    if (ubiq_selected_command > matches.length
+        || ubiq_selected_command == -1) {
+        ubiq_selected_command = 0;
+    }
+
     // We have matches, show a list
     if (matches.length > 0) {
 
@@ -514,11 +575,22 @@ function ubiq_show_matching_commands (text) {
         var suggestions_list = document.createElement('ul');
         suggestions_list.style = 'padding:0; margin:0';
 
+        ubiq_show_tip(matches[ubiq_selected_command]);
+
         for (var c in matches) {
+            var is_selected = (c == ubiq_selected_command);
             var li=document.createElement('li');
-            var li_bg=ubiq_url_for(c==0 ? 'selected_background.png' : 'command_background.png');
-            //var li_bg=ubiq_url_for('command_background.png');
-            li.innerHTML=matches[c];
+            var li_bg=ubiq_url_for(is_selected ? 'selected_background.png' : 'command_background.png');
+            c = matches[c];
+            if (c == '...') {
+                li.innerHTML = c;
+            }
+            else {
+                var icon = ubiq_command_icon(c);
+                var cmd  = ubiq_command_name(c);
+                if (is_selected) ubiq_first_match = cmd;
+                li.innerHTML=icon + cmd;
+            }
             li.style = 'color: black; list-style: none; margin:0; padding-top:8px; padding-left:12px;'
                 + 'font-family: Helvetica,Arial; font-size: 14px; height:26px;'
                 + 'background-image:'+li_bg+'; background-repeat: no-repeat;';
@@ -529,6 +601,8 @@ function ubiq_show_matching_commands (text) {
         results_panel.innerHTML = suggestions_div.innerHTML;
     }
     else {
+        ubiq_selected_command = -1;
+        ubiq_show_tip(null);
         results_panel.innerHTML = ubiq_help();
     }
 
@@ -546,10 +620,12 @@ function ubiq_key_handler (userjs_event) {
     // If we're in the background (or not created), return immediately
     // Otherwise, activate only on CTRL + Space
 	if (! ubiq_enabled()) {
+
     	// Create our window if not already done 
 		if (! ubiq_window) {
 			ubiq_window = ubiq_create_window();
         }
+
 		if (ctrl_space_pressed) {
     		// Get text selection before switching window focus
 			ubiq_get_selection();
@@ -558,18 +634,42 @@ function ubiq_key_handler (userjs_event) {
 			ubiq_focus(ubiq_window);
 		}
 	}
+
 	else {
+
 		if (ctrl_space_pressed) {
 			ubiq_toggle_window(ubiq_window);
 			return;
 		}
+
         // On ENTER, execute the given command
 		if (kc==13) {
             ubiq_execute();
             return;
         }
+
+        // Cursor UP/DOWN, select command
+        if (kc==38) {
+            ubiq_select_prev_command();
+        }
+
+        if (kc==40) {
+            ubiq_select_next_command();
+        }
+
         ubiq_show_matching_commands();
 	}
+
+}
+
+function ubiq_select_prev_command () {
+    if (ubiq_selected_command > 0) {
+        ubiq_selected_command--;
+    }
+}
+
+function ubiq_select_next_command () {
+    ubiq_selected_command++;
 }
 
 /* Add event handler to window */
