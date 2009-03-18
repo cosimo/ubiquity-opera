@@ -648,12 +648,12 @@ function ubiq_key_handler (userjs_event) {
             return;
         }
 
-        // Cursor UP/DOWN, select command
+        // Cursor up
         if (kc==38) {
             ubiq_select_prev_command();
         }
-
-        if (kc==40) {
+        // Cursor Down
+        else if (kc==40) {
             ubiq_select_next_command();
         }
 
