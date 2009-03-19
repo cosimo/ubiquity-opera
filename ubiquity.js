@@ -563,8 +563,11 @@ function ubiq_show_matching_commands (text) {
     // Where to show the results
     var results_panel = document.getElementById('ubiq-results-panel');
 
-    if (ubiq_selected_command > matches.length
-        || ubiq_selected_command == -1) {
+    // Don't navigate outside boundaries of the list of matches
+    if (ubiq_selected_command >= matches.length) {
+        ubiq_selected_command = matches.length - 1;
+    }
+    else if (ubiq_selected_command == -1) {
         ubiq_selected_command = 0;
     }
 
