@@ -45,6 +45,7 @@ var ubiq_commands = new Array (
     'back',
     'bugzilla',
     'close',
+    'clusty',
     'command-list',
     'define',
     'dramatic-chipmunk',
@@ -69,6 +70,7 @@ var ubiq_commands = new Array (
     'search',
     'skin-list',
     'stackoverflow-search',
+    'torrent-search',
     'translate',
     //'twitter',   *** Non functional, due to security restrictions. I have an idea... 
     'weather',
@@ -85,6 +87,7 @@ var ubiq_commands_tip = new Array (
     'Go back 1 step in history',
     'Perform a bugzilla search for',
     'Close the current window',
+    'Searches clusty.com for',
     'Shows the list of Ubiquity commands and what they do',
     'Gives the definition of a word',
     'Prepare to a dramatic moment of your life',
@@ -109,7 +112,8 @@ var ubiq_commands_tip = new Array (
     'Search using Google for',
     'Browse or search Opera skins on my.opera.com',
     'Searches questions and answers on stackoverflow.com',
-    'Translates the given words (or text selection, or the current window) from Norwegian to English',
+    'Searches PirateBay and Torrentz in new tabs.',
+    'Translates the given words (or text selection, or the current window) to English',
     //'Update your twitter status',
     'Shows the weather forecast for',
     'Searches Wikipedia',
@@ -125,6 +129,7 @@ var ubiq_commands_icon = new Array (
     '',
     'http://www.mozilla.org/favicon.ico',
     '',
+    'http://clusty.com/images/clusty-favicon.ico',
     '', // Command list?
     'http://www.answers.com/favicon.ico',
     'http://www.youtube.com/favicon.ico',
@@ -148,6 +153,7 @@ var ubiq_commands_icon = new Array (
     'http://www.google.com/favicon.ico',
     'http://my.opera.com/favicon.ico',
     'http://stackoverflow.com/favicon.ico',
+    'http://thepiratebay.org/favicon.ico',
     'http://www.google.com/favicon.ico',
     //'http://www.twitter.com/favicon.ico',
     'http://www.accuweather.com/favicon.ico',
@@ -270,6 +276,9 @@ function ubiq_dispatch_command(line) {
         ubiq_toggle_window(ubiq_window);
         window.close();
     }
+    else if (cmd=='clusty') {
+        ubiq_cmd_url_based('http://clusty.com/search?query='+escape(text));
+    }
     else if (cmd=='command-list') {
         ubiq_show_matching_commands('*all');
     }
@@ -287,6 +296,9 @@ function ubiq_dispatch_command(line) {
     }
     else if (cmd=='google' || cmd=='search') {
         ubiq_cmd_url_based('http://www.google.com/search?client=opera&q='+escape(text)+'&sourceid=opera&ie=utf-8&oe=utf-8');
+    }
+    else if (cmd=='help' || cmd=='about') {
+        ubiq_display_results(ubiq_help());
     }
     else if (cmd=='image-search') {
         ubiq_cmd_url_based('http://images.google.com/images?hl=en&q='+escape(text)+'&client=opera&sourceid=opera');
@@ -334,6 +346,10 @@ function ubiq_dispatch_command(line) {
     else if (cmd=='stackoverflow-search') {
         ubiq_cmd_url_based('http://stackoverflow.com/search?q=' + escape(text));
     }
+    else if (cmd=='torrent-search') {
+        ubiq_cmd_url_based('http://thepiratebay.org/search.php?q=' + escape(text));
+        ubiq_cmd_url_based('http://www.torrentz.com/search?q=' + escape(text));
+    }
     else if (cmd=='translate') {
         ubiq_cmd_translate(text);
     }
@@ -348,9 +364,6 @@ function ubiq_dispatch_command(line) {
     }
     else if (cmd=='wikipedia') {
         ubiq_cmd_url_based('http://en.wikipedia.org/wiki/Special:Search?search='+escape(text));
-    }
-    else if (cmd=='help' || cmd=='about') {
-        ubiq_display_results(ubiq_help());
     }
     else if (cmd=='yahoo-answers') {
         ubiq_cmd_url_based('http://answers.yahoo.com/search/search_result;_ylv=3?p='+escape(text));
@@ -422,8 +435,13 @@ function ubiq_cmd_refresh () {
     document.location.reload();
 }
 
-function ubiq_new_window (url) {
-    window.open(url, 'ubiq_tab');
+function ubiq_new_window (url,name) {
+    if (!name) {
+        window.open(url);
+    }
+    else {
+        window.open(url, name);
+    }
 }
 
 function ubiq_get_selection () {
