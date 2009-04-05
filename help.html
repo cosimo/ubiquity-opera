@@ -1,0 +1,133 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>Ubiquity for Opera - Help</title>
+<meta name="author" content="Cosimo Streppone">
+<meta name="description" content="Homepage of Ubiquity for Opera, an experimental project to port the Ubiquity Firefox extension (http://labs.mozilla.org/projects/ubiquity/) to the Opera browser, using UserJS">
+<meta name="keywords" content="ubiquity opera browser extensions firefox userjs herd feed commands">
+<link rel="shortcut icon" href="http://static.myopera.com/community/favicon.ico" type="image/x-icon">
+<style type="text/css">
+body {
+	background-color:#fff;
+	color:#333;
+	font-family:"Times New Roman",Times,Helvetica;
+	font-size: 1em;
+}
+h1 {
+	background-color: #e30;
+	color: #fff;
+	padding: 5px;
+	border:1px solid #faa;
+	font-family:"Lucida Sans Unicode",Helvetica,Arial;
+}
+h2 {
+	color: #e30;
+	margin-top: 1em;
+	border-bottom: 1px solid #fcc;
+	line-height: 0.8em;
+	font-family:"Lucida Sans Unicode",Helvetica,Arial;
+}
+</style>
+</head>
+
+<body>
+
+<h1>Ubiquity for Opera</h1>
+
+<h2>Help</h2>
+
+<p>
+You're probably wondering what <strong>Ubiquity for Opera</strong> is or how does it work.
+The <a href="http://labs.mozilla.org/projects/ubiquity/">original Ubiquity</a>
+is a <a href="http://mozilla.org/products/firefox/">Firefox</a> extension that
+brings a textual interface to the browser.<br> 
+<strong>Ubiquity for Opera</strong> is an attempt to port this extension to
+<a href="http://www.opera.com/browser/">the Opera browser</a>, using the
+<a href="http://www.opera.com/browser/tutorials/userjs/">UserJS</a> feature,
+a sort of built-in <a href="https://addons.mozilla.org/it/firefox/addon/748">GreaseMonkey</a> that Opera has.
+</p>
+
+<p>
+Due to UserJS security protection and limitations, some of the features of the
+original Ubiquity are not available in the Opera version. Particularly, no
+access to external HTTP resources is allowed, and there's no access to the
+browser chrome... However, Ubiquity for Opera is still useful. Try it!
+</p>
+
+<h2>How does Ubiquity work?</h2>
+
+<p>
+You can start using it, if you already installed and configured it, by
+typing: <code>CTRL + SPACE</code>.<br>
+This is the default shortcut that brings up the Ubiquity window. This is
+nothing more than a simple text field.</p>
+
+<p>
+You just type the command you want to execute, ex.: <code>clusty opera browser</code>
+and there you go, you get the search results. Here's a screenshot:
+</p>
+
+<div align="center">
+<img src="ubiquity-opera-screenshot1.png" border="0"/>
+</div>
+
+<h2>Example of commands</h2>
+
+<p>
+Some examples of the commands you can try in Ubiquity:
+<ul>
+<li><code>google Opera UserJS tutorial</code></li>
+<li><code>imdb Matrix</code></li>
+<li><code>maps Colosseo, Roma</code></li>
+<li>Select a word or sentence on the page you're browsing, and then
+type <code>translate</code> without any word. It will pick up the selected
+text and translate it through Google Translate.</li>
+<li><code>youtube Paul McCartney</code></li>
+<li><code>dramatic-chipmunk</code></li>
+<li><code>validate</code>, will validate through the W3C Validator service the currently
+opened window URL</li>
+</ul>
+</p>
+
+<h2>How to install Ubiquity for Opera</h2>
+
+<p>
+If you landed on this page, you probably have Ubiquity already installed.
+If not, follow these simple steps:
+</p>
+
+<ul>
+<li>Enable <strong>UserJS</strong>.
+Point your browser to <a href="opera:config#Javascript">opera:config#Javascript</a> and:
+<ul>
+<li>tick the <strong>"User Javascript"</strong> checkbox</li>
+<li>in the <strong>"User Javascript File"</strong> textfield, type the name of the folder
+you want to run the scripts from. You can create an empty one wherever
+you want.</li>
+<li>If you want, you can also enable the checkbox to allow <strong>UserJS execution
+in HTTPS pages</strong>.</li>
+</ul>
+<li>Remove the default shortcut key bound to <code>CTRL + SPACE</code>,
+since the original Ubiquity is activated and deactivated
+with <code>CTRL + SPACE</code>.</li>
+</ul>
+
+<h2>How to get help?</h2>
+
+<p>
+Are you stuck? Do you have questions?
+</p>
+
+<p>
+If you are experiencing problems installing or using Ubiquity for Opera,
+there's not that much I can do for you, given this is a spare-time, mostly
+night hobby for me, but try to post your question in the 
+<a href="http://my.opera.com/userjs/forums/">official UserJS forums</a>.
+</p>
+
+<br>
+<br>
+
+</body>
+</html>
