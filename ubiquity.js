@@ -7,7 +7,7 @@
 //
 // Original Ubiquity Project: http://labs.mozilla.org/ubiquity/
 //
-// To use this in Opera, you have to:
+// To use this in Opera, you need to:
 //
 // * Enable UserJS. Point your browser to opera:config#Javascript and:
 //
@@ -27,7 +27,6 @@
 // ----------------------------------------------
 // Cosimo Streppone, <cosimo@opera.com>
 // First version: 19/01/2009
-//
 //
 // $Id$
 ;
@@ -81,6 +80,7 @@ CmdUtils.SimpleUrlBasedCommand = function SimpleUrlBasedCommand (url) {
         text = encodeURIComponent(text);
         url = url.replace('{text}', text);
         url = url.replace('{location}', CmdUtils.getLocation());
+        CmdUtils.toggleUbiquityWindow();
         Utils.openUrlInBrowser(url);
     };
     return search_func;
@@ -323,8 +323,10 @@ function ubiq_match_first_command(text) {
 
 function ubiq_command_icon(c) {
     var icon = CmdUtils.CommandList[c]['icon'];
-    if (icon) icon = 'src="' + icon + '" ';
-    icon = '<img '+ icon + ' width="16" height="16" border="0" alt="" align="absbottom"> ';
+    if (!icon) {
+        icon = 'http://people.opera.com/cosimo/ubiquity/spacer.png';
+    }
+    icon = '<img src="' + icon + '" width="16" height="16" border="0" alt="" align="absmiddle"> ';
     return icon;
 }
 
@@ -632,15 +634,18 @@ CmdUtils.CreateCommand({
 });
 
 CmdUtils.CreateCommand({
-    name: "define",
-    takes: {"search_string": noun_arb_text},
-    description: "Gives the definition of a word",
-    author: {},
-    icon: "http://www.ask.com/favicon.ico",
-    homepage: "",
-    license: "",
-    preview: "Gives the definition of a word",
-    execute: CmdUtils.SimpleUrlBasedCommand('http://www.ask.com/web?q={text}')
+  name: "dictionary",
+  description: "Gives the meaning of a word.",
+  author: { name: "Isidoros Passadis", email: "isidoros.passadis@gmail.com"},
+  help: "Try issuing &quot;dictionary ubiquity&quot;",
+  license: "MPL",
+  icon: "http://dictionary.reference.com/favicon.ico",
+  takes: {"word": noun_arb_text},
+  execute: function( directObj ) {
+    var word = directObj.text;
+    Utils.openUrlInBrowser( "http://dictionary.reference.com/search?q=" + escape(word) );
+  },
+  preview: "Gives the meaning of a word.",
 });
 
 CmdUtils.CreateCommand({
@@ -1018,9 +1023,14 @@ CmdUtils.CreateCommand({
       preview: function(pblock, theShout) {  
           pblock.innerHTML = "Buscar versiones antiguas del sitio <b>" +  theShout.text + "</b>"          
       },
-      execute: CmdUtils.SimpleUrlBasedCommand(
-          "http://web.archive.org/web/*/{text}"
-      )
+      execute: function (directObj) {
+          CmdUtils.toggleUbiquityWindow();
+          var url = directObj.text;
+          if (! url) url = CmdUtils.getLocation();
+          var wayback_machine = "http://web.archive.org/web/*/" + url;
+          // Take me back!
+          CmdUtils.openWindow(wayback_machine);
+      }
 });
 
 CmdUtils.CreateCommand({
@@ -1093,4 +1103,36 @@ CmdUtils.CreateCommand({
     )
 });
 
+//
+// From Ubiquity feed:
+// https://ubiquity.mozilla.com/herd/all-feeds/9b0b1de981e80b6fcfee0659ffdbb478d9abc317-4742/
+//
+CmdUtils.CreateCommand({
+  name: "isdown",
+  icon: "http://downforeveryoneorjustme.com/favicon.ico",
+  description: "Check if selected/typed URL is down",
+  homepage: "http://www.andyfilms.net",
+  author: { name: "Andy Jarosz", email: "andyfilms1@yahoo.com"},
+  license: "GPL",
+  takes: {URL: noun_arb_text},
+  preview: function(pblock, directObject) {
+    searchText = jQuery.trim(directObject.text);
+    if(searchText.length < 1) {
+      pblock.innerHTML = "Checks if URL is down";
+      return;
+    }
+    var previewTemplate = "Checks is <b>${query}</b> is down";
+    var previewData = {query: searchText};
+    pblock.innerHTML = CmdUtils.renderTemplate(previewTemplate, previewData);
+
+  },
+  execute: function(directObject) {
+    var url = "http://downforeveryoneorjustme.com/{QUERY}"
+    var query = directObject.text;
+    var urlString = url.replace("{QUERY}", query);
+    Utils.openUrlInBrowser(urlString);
+  }
+});
+
 // vim: ts=4 sw=4 tw=0 et
+
