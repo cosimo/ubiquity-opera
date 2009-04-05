@@ -44,14 +44,53 @@
 if (CmdUtils == undefined) var CmdUtils = {}
 noun_arb_text = 1;
 CmdUtils.VERSION = 0.01;
-CmdUtils.CommandList = new Array();
-CmdUtils.CreateCommand = function (args) {
+CmdUtils.CommandList = new Array ();
+CmdUtils.CreateCommand = function CreateCommand (args) {
 	var cmd_name = args['name'];
 	var cmd_list = CmdUtils.CommandList;
 	if (cmd_name in cmd_list) {
 		return;
 	}
 	CmdUtils.CommandList.push(args);
+}
+CmdUtils.closeWindow = function closeWindow () {
+    CmdUtils.getWindow().close();
+}
+CmdUtils.getDocument = function getDocument () {
+    return document;
+}
+CmdUtils.getLocation = function getLocation () {
+    return CmdUtils.getDocument().location;
+}
+CmdUtils.getWindow = function getWindow () {
+    return window;
+}
+CmdUtils.openWindow = function openWindow (url,name) {
+    if (!name) {
+        CmdUtils.getWindow().open(url);
+    } else {
+        CmdUtils.getWindow().open(url, name);
+    }
+}
+// Search 2nd order function
+CmdUtils.SimpleUrlBasedCommand = function SimpleUrlBasedCommand (url) {
+    if (! url) return;
+    var search_func = function (directObj) {
+        if (! directObj) return;
+        var text = directObj.text;
+        text = encodeURIComponent(text);
+        url = url.replace('{text}', text);
+        url = url.replace('{location}', CmdUtils.getLocation());
+        Utils.openUrlInBrowser(url);
+    };
+    return search_func;
+}
+CmdUtils.toggleUbiquityWindow = function toggleUbiquityWindow (w) {
+    if (!w) w = ubiq_window;
+    var vis = w.style.visibility;
+    if (vis=='hidden') vis='visible' else vis='hidden';
+    w.style.visibility=vis;
+    return;
 }
 
 //
@@ -78,131 +117,6 @@ var ubiq_remote_server = 'http://people.opera.com/cosimo/ubiquity';
 var ubiq_selected_command;
 var ubiq_first_match;
 
-var ubiq_commands = new Array (
-    'amazon-search',
-    'answers-search',
-    'ask-search',
-    'back',
-    'bugzilla',
-    'close',
-    'clusty',
-    'command-list',
-    'define',
-    'dramatic-chipmunk',
-    'ebay-search',
-    'flickr',
-    'google',
-    'gcalculate',
-    'help',
-    'image-search',
-    'imdb',
-    'lastfm',
-    'map',
-    'msn-search',
-    'myopera-blogs',
-    'myopera-photos',
-    'new-tab',
-    'opera-config',
-    'opera-cache',
-    //'opera-bugs',
-    'print',
-    'refresh',
-    'search',
-    'skin-list',
-    'stackoverflow-search',
-    'torrent-search',
-    'translate',
-    //'twitter',   *** Non functional, due to security restrictions. I have an idea... 
-    'weather',
-    'wikipedia',
-    'yahoo-answers',
-    'yahoo-search',
-    'youtube'
-);
-
-var ubiq_commands_tip = new Array (
-    'Searches Amazon for books matching:',
-    'Searches Answers.com for',
-    'Searches Ask.com for the given words',
-    'Go back 1 step in history',
-    'Perform a bugzilla search for',
-    'Close the current window',
-    'Searches clusty.com for',
-    'Shows the list of Ubiquity commands and what they do',
-    'Gives the definition of a word',
-    'Prepare to a dramatic moment of your life',
-    'Searches EBay for the given words',
-    'Searches for photos on Flickr',
-    'Searches Google for your words',
-    'Examples: 3^4/sqrt(2)-pi,  3 inch in cm,  speed of light,  0xAF in decimal (<a href="http://www.googleguide.com/calculator.html">Command list</a>)',
-    'Provides basic help on using Ubiquity for Opera',
-    'Search on Google Images',
-    'Searches for movies on imdb',
-    'Listen to some artist radio on Last.fm',
-    'Shows a location on the map',
-    'Searches MSN for the given words',
-    'Searches for blogs on the My Opera Community',
-    'Searches for photos on the My Opera Community',
-    'Opens a new tab (or window) with the specified URL',
-    'Shows your Opera browser preferences (filtered by given words)',
-    'Shows your Opera browser cache contents',
-    'Print current page',
-    //'Search in the Opera bug tracking database for',
-    'Refreshes current document',
-    'Search using Google for',
-    'Browse or search Opera skins on my.opera.com',
-    'Searches questions and answers on stackoverflow.com',
-    'Searches PirateBay and Torrentz in new tabs.',
-    'Translates the given words (or text selection, or the current window) to English',
-    //'Update your twitter status',
-    'Shows the weather forecast for',
-    'Searches Wikipedia',
-    'Searches Yahoo Answers for',
-    'Searches Yahoo for',
-    'Searches for videos on Youtube'
-);
-
-var ubiq_commands_icon = new Array (
-    'http://www.amazon.com/favicon.ico',
-    'http://www.answers.com/favicon.ico',
-    'http://www.ask.com/favicon.ico',
-    '',
-    'http://www.mozilla.org/favicon.ico',
-    '',
-    'http://clusty.com/images/clusty-favicon.ico',
-    '', // Command list?
-    'http://www.answers.com/favicon.ico',
-    'http://www.youtube.com/favicon.ico',
-    'http://ebay.com/favicon.ico',
-    'http://flickr.com/favicon.ico',
-    'http://www.google.com/favicon.ico',
-    '', // Calculator?
-    'http://upload.wikimedia.org/wikipedia/commons/4/44/Help-browser.svg',
-    'http://www.google.com/favicon.ico',
-    'http://www.imdb.com/favicon.ico',
-    'http://lastfm.com/favicon.ico',
-    'http://www.google.com/favicon.ico', // Maps
-    'http://www.live.com/favicon.ico',
-    'http://my.opera.com/favicon.ico',
-    'http://my.opera.com/favicon.ico',
-    '',
-    'http://www.opera.com/favicon.ico',
-    'http://www.opera.com/favicon.ico',
-    '',
-    '',
-    'http://www.google.com/favicon.ico',
-    'http://my.opera.com/favicon.ico',
-    'http://stackoverflow.com/favicon.ico',
-    'http://thepiratebay.org/favicon.ico',
-    'http://www.google.com/favicon.ico',
-    //'http://www.twitter.com/favicon.ico',
-    'http://www.accuweather.com/favicon.ico',
-    'http://en.wikipedia.org/favicon.ico',
-    'http://l.yimg.com/a/i/us/sch/gr/answers_favicon.ico',
-    'http://www.yahoo.com/favicon.ico',
-    'http://www.youtube.com/favicon.ico'
-);
-
 // Used to get css url of images and other resources
 function ubiq_url_for (path) {
     var url = 'url(';
@@ -226,7 +140,7 @@ function ubiq_create_window () {
     stl.height='561px';
     stl.border='0';
     stl.padding='0';
-    /* Our window should appear on top of everything */
+    // Our window should appear on top of everything 
     stl.zIndex='99999';
     stl.background = ubiq_url_for('ubiq_background.png');
     wnd.innerHTML = ubiq_start_mode();
@@ -257,7 +171,6 @@ function ubiq_start_mode () {
         + '<div id="ubiq-command-tip" style="position:absolute;left:310px;top:65px;display:block;border:0;color:#ddd;font-family:Helvetica,Arial;font-style:italic;font-size:11pt"></div>'
         + '<div id="ubiq-command-preview" style="position:absolute;left:310px;top:85px;display:block;overflow:auto;border:0;color:#ddd;"></div>'
         ;
-    //html += '<' + 'script language="javascript">document.addEventListener("keydown",ubiq_active_key_handler,false);</script>';
     return html;
 }
 
@@ -268,7 +181,7 @@ function ubiq_show_tip (tip) {
         el.innerHTML = '';
         return;
     }
-    tip = ubiq_commands_tip[tip];
+    tip = CmdUtils.CommandList[tip]['description'];
     el.innerHTML = tip;
     return;
 }
@@ -296,155 +209,34 @@ function ubiq_dispatch_command(line) {
     cmd = ubiq_match_first_command(cmd);
     ubiq_replace_first_word(cmd);
 
-    if (cmd=='amazon-search') {
-        ubiq_cmd_url_based('http://www.amazon.com/s/ref=nb_ss_gw?url=search-alias%3Dstripbooks&field-keywords=' + escape(text));
+    // Find command element
+    var cmd_struct;
+    for (var c in CmdUtils.CommandList) {
+        var cmd_name = CmdUtils.CommandList[c]['name'];
+        if (cmd_name == cmd) {
+            cmd_struct = CmdUtils.CommandList[c];
+            break;
+        }
     }
-    else if (cmd=='answers-search') {
-        ubiq_cmd_url_based('http://www.answers.com/' + escape(text));
+
+    if (! cmd_struct) {
+        return;
     }
-    else if (cmd=='ask-search' || cmd=='define') {
-        ubiq_cmd_url_based('http://www.ask.com/web?q=' + escape(text));
-    }
-    else if (cmd=='back') {
-        history.go(-2);
-        ubiq_toggle_window(ubiq_window);
-    }
-    else if (cmd=='bugzilla') {
-        ubiq_cmd_url_based('https://bugzilla.mozilla.org/buglist.cgi?query_format=specific&order=relevance+desc&bug_status=__open__&content='+escape(text));
-    }
-    else if (cmd=='close') {
-        ubiq_toggle_window(ubiq_window);
-        window.close();
-    }
-    else if (cmd=='clusty') {
-        ubiq_cmd_url_based('http://clusty.com/search?query='+escape(text));
-    }
-    else if (cmd=='command-list') {
-        ubiq_show_matching_commands('*all');
-    }
-    else if (cmd=='dramatic-chipmunk') {
-        ubiq_cmd_url_based('http://www.youtube.com/watch?v=a1Y73sPHKxw');
-    }
-    else if (cmd=='ebay-search') {
-        ubiq_cmd_url_based('http://search.ebay.com/search/search.dll?satitle=' + escape(text));
-    }
-    else if (cmd=='flickr') {
-        ubiq_cmd_url_based('http://www.flickr.com/search/?q='+escape(text)+'&w=all');
-    }
-    else if (cmd=='gcalculate') {
-        ubiq_cmd_url_based('http://www.google.com/search?client=opera&num=1&q='+escape(text)+'&sourceid=opera&ie=utf-8&oe=utf-8');
-    }
-    else if (cmd=='google' || cmd=='search') {
-        ubiq_cmd_url_based('http://www.google.com/search?client=opera&q='+escape(text)+'&sourceid=opera&ie=utf-8&oe=utf-8');
-    }
-    else if (cmd=='help' || cmd=='about') {
-        ubiq_display_results(ubiq_help());
-    }
-    else if (cmd=='image-search') {
-        ubiq_cmd_url_based('http://images.google.com/images?hl=en&q='+escape(text)+'&client=opera&sourceid=opera');
-    }
-    else if (cmd=='imdb') {
-        ubiq_cmd_url_based('http://www.imdb.com/find?s=all&q='+escape(text)+'&x=0&y=0');
-    }
-    else if (cmd=='lastfm') {
-        ubiq_cmd_url_based('http://www.lastfm.com/listen/artist/'+escape(text)+'/similarartists');
-    }
-    else if (cmd=='map') {
-        ubiq_cmd_url_based('http://maps.google.com/maps?q='+escape(text));
-    }
-    else if (cmd=='msn-search') {
-        ubiq_cmd_url_based('http://search.msn.com/results.aspx?q='+escape(text));
-    }
-    else if (cmd=='myopera-blogs') {
-        ubiq_cmd_url_based('http://my.opera.com/community/blogs/?search='+escape(text));
-    }
-    else if (cmd=='myopera-photos') {
-        ubiq_cmd_url_based('http://my.opera.com/community/photos/?search='+escape(text));
-    }
-    else if (cmd=='new-tab') {
-        ubiq_toggle_window(ubiq_window);
-        // Open a new tab with URL = text
-        if (! text) text='about:';
-        window.open(text);
-    }
-    else if (cmd=='opera-config') {
-        ubiq_cmd_url_based('opera:config#' + escape(text));
-    }
-    else if (cmd=='opera-cache') {
-        ubiq_cmd_url_based('opera:cache');
-    }
-    else if (cmd=='print') {
-        ubiq_toggle_window(ubiq_window);
-        window.print();
-    }
-    else if (cmd=='refresh') {
-        ubiq_cmd_refresh();
-    }
-    else if (cmd=='skin-list') {
-        ubiq_cmd_url_based('http://my.opera.com/community/customize/skins/?search=' + escape(text));
-    }
-    else if (cmd=='stackoverflow-search') {
-        ubiq_cmd_url_based('http://stackoverflow.com/search?q=' + escape(text));
-    }
-    else if (cmd=='torrent-search') {
-        ubiq_cmd_url_based('http://thepiratebay.org/search.php?q=' + escape(text));
-        ubiq_cmd_url_based('http://www.torrentz.com/search?q=' + escape(text));
-    }
-    else if (cmd=='translate') {
-        ubiq_cmd_translate(text);
-    }
-    else if (cmd=='twitter') {
-        ubiq_cmd_twitter_status(text);
-    }
-    else if (cmd=='yahoo-search') {
-        ubiq_cmd_url_based('http://search.yahoo.com/search?p='+escape(text)+'&ei=UTF-8');
-    }
-    else if (cmd=='weather') {
-        ubiq_cmd_url_based('http://www.wunderground.com/cgi-bin/findweather/getForecast?query='+escape(text));
-    }
-    else if (cmd=='wikipedia') {
-        ubiq_cmd_url_based('http://en.wikipedia.org/wiki/Special:Search?search='+escape(text));
-    }
-    else if (cmd=='yahoo-answers') {
-        ubiq_cmd_url_based('http://answers.yahoo.com/search/search_result;_ylv=3?p='+escape(text));
-    }
-    else if (cmd=='yahoo-search') {
-        ubiq_cmd_url_based('http://search.yahoo.com/search?p='+escape(text)+'&ei=UTF-8');
-    }
-    else if (cmd=='youtube') {
-        ubiq_cmd_url_based('http://www.youtube.com/results?search_type=search_videos&search_sort=relevance&search_query='+escape(text)+'&search=Search');
-    }
+
+    // Create a fake Ubiquity-like object, to pass to
+    // command's "execute" function
+    var cmd_func = cmd_struct['execute'];
+    var direct_obj = { "text": text };
+
+    // Run command's "execute" function
+    cmd_func(direct_obj);
 
     return;
-}
-
-function ubiq_cmd_twitter_status(text) {
-    ubiq_toggle_window(ubiq_window);
-    var endpoint = 'http://twitter.com/statuses/update.json';
-    ubiq_post_request(endpoint, 'status='+escape(text)+'&app=myopera');
-    return;
-}
-
-// Fire and forget POST request
-// XXX This will never work, due to security restrictions, unless...
-function ubiq_post_request (url, params) {
-    var req=new XMLHttpRequest();
-    req.open('POST',url,true);
-    req.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
-    req.setRequestHeader('Content-length', params.length);
-    req.setRequestHeader('Connection', 'close');
-    req.send(params);
-}
-
-function ubiq_cmd_url_based (url) {
-    ubiq_toggle_window(ubiq_window);
-    ubiq_new_window(url);
 }
 
 function ubiq_display_results (text) {
     var div=document.getElementById('ubiq-results-panel');
     if (! div) alert('no div!');
-    //opera.postError('help text='+text);
     div.innerHTML = text;
     div.style.visibility='show';
 }
@@ -453,35 +245,6 @@ function ubiq_help () {
     var style = 'font-size:17px; padding:8px; font-weight:normal';
     var html = '<p style="' + style + '">Type the name of a command and press enter to execute it, or <b>help</b> for assistance.</p>';
     return html;
-}
-
-function ubiq_cmd_translate (text) {
-    ubiq_toggle_window(ubiq_window);
-    // HARD !!!
-    //alert(ubiq_element.innerHTML);
-    //var html = ubiq_element.innerHTML.replace(text, 'blah blah blah');
-    //ubiq_element.innerHTML = html;
-    if (! text || text.length == 0 || text.match('^https?://')) {
-        if (! text) text = window.location.href;
-        url = 'http://translate.google.com/translate?prev=_t&ie=UTF-8&sl=auto&tl=auto&history_state0=&u=';
-    } else {
-        url = 'http://translate.google.com/translate_t?#auto|auto|';
-    }
-    ubiq_new_window(url + text);
-}
-
-function ubiq_cmd_refresh () {
-    ubiq_toggle_window(ubiq_window);
-    document.location.reload();
-}
-
-function ubiq_new_window (url,name) {
-    if (!name) {
-        window.open(url);
-    }
-    else {
-        window.open(url, name);
-    }
 }
 
 function ubiq_get_selection () {
@@ -547,8 +310,8 @@ function ubiq_match_first_command(text) {
     }
 
     if (text.length > 0) {
-        for (var c in ubiq_commands) {
-            c = ubiq_commands[c];
+        for (var c in CmdUtils.CommandList) {
+            c = CmdUtils.CommandList[c]['name'];
             if (c.match('^' + text)) {
                 first_match = c;
                 break;
@@ -559,14 +322,14 @@ function ubiq_match_first_command(text) {
 }
 
 function ubiq_command_icon(c) {
-    var icon = ubiq_commands_icon[c];
+    var icon = CmdUtils.CommandList[c]['icon'];
     if (icon) icon = 'src="' + icon + '" ';
-    icon = '<img '+ icon + ' width="16" height="16" border="0" align="absbottom"> ';
+    icon = '<img '+ icon + ' width="16" height="16" border="0" alt="" align="absbottom"> ';
     return icon;
 }
 
 function ubiq_command_name(c) {
-    return ubiq_commands[c];
+    return CmdUtils.CommandList[c]['name'];
 }
 
 function ubiq_replace_first_word(w) {
@@ -592,8 +355,8 @@ function ubiq_show_matching_commands (text) {
     var matches = new Array();
     var substr_matches = new Array();
     if (text.length > 0) {
-        for (var c in ubiq_commands) {
-            var cmd = ubiq_commands[c];
+        for (var c in CmdUtils.CommandList) {
+            var cmd = CmdUtils.CommandList[c]['name'];
             // Starting match only /^command/
             if (show_all || cmd.match('^' + text)) {
                 matches.push(c);
@@ -733,7 +496,7 @@ function ubiq_select_next_command () {
     ubiq_selected_command++;
 }
 
-/* Add event handler to window */
+// Add event handler to window 
 window.opera.addEventListener('afterEvent.keyup', ubiq_key_handler, false);
 
 //--------------------------------------------------------
@@ -745,78 +508,589 @@ window.opera.addEventListener('afterEvent.keyup', ubiq_key_handler, false);
 CmdUtils.CreateCommand({
     name: "amazon-search",
     takes: {"search_string": noun_arb_text},
-    description: "Searches Amazon for books matching:",
-    author: { name: "Cosimo Streppone", email: "cosimo@cpan.org" },
+    description: "Search Amazon for books matching:",
+    author: {},
     icon: "http://www.amazon.com/favicon.ico",
     homepage: "",
     license: "",
-    preview: "Searches Amazon for books matching:",
+    preview: "Search Amazon for books matching:",
+    execute: CmdUtils.SimpleUrlBasedCommand(
+        'http://www.amazon.com/s/ref=nb_ss_gw?url=search-alias%3Dstripbooks&field-keywords={text}'
+    )
+});
+
+CmdUtils.CreateCommand({
+    name: "answers-search",
+    takes: {"search_string": noun_arb_text},
+    description: "Search Answers.com for:",
+    author: {},
+    icon: "http://www.answers.com/favicon.ico",
+    homepage: "",
+    license: "",
+    preview: "Search Answers.com for:",
+    execute: CmdUtils.SimpleUrlBasedCommand('http://www.answers.com/{text}')
+});
+
+CmdUtils.CreateCommand({
+    name: "ask-search",
+    takes: {"search_string": noun_arb_text},
+    description: "Search Ask.com for the given words",
+    author: {},
+    icon: "http://www.ask.com/favicon.ico",
+    homepage: "",
+    license: "",
+    preview: "Search Ask.com for the given words:",
+    execute: CmdUtils.SimpleUrlBasedCommand('http://www.ask.com/web?q={text}')
+});
+
+CmdUtils.CreateCommand({
+    name: "back",
+    takes: {"pages": noun_arb_text}, // FIXME SHOULD BE INTEGER SOMETHING
+    description: "Go back in browser history",
+    author: {},
+    icon: "",
+    homepage: "",
+    license: "",
+    preview: "Go back {text} steps in history",
     execute: function (directObj) {
-        var search_string = encodeURIComponent(directObj.text);
-        Utils.openUrlInBrowser('http://www.amazon.com/s/ref=nb_ss_gw?url=search-alias%3Dstripbooks&field-keywords=' + search_string);
+        var steps = parseInt (directObj.text);
+        steps = - steps - 1;
+        history.go(steps);
+        CmdUtils.toggleUbiquityWindow();
     }
+});
+
+CmdUtils.CreateCommand({
+    name: "bugzilla",
+    takes: {"search_string": noun_arb_text},
+    description: "Perform a bugzilla search for",
+    author: {},
+    icon: "http://www.mozilla.org/favicon.ico",
+    homepage: "",
+    license: "",
+    preview: "Perform a bugzilla search for",
+    execute: CmdUtils.SimpleUrlBasedCommand(
+        "https://bugzilla.mozilla.org/buglist.cgi?query_format=specific&order=relevance+desc&bug_status=__open__&content={text}"
+    )
+});
+
+CmdUtils.CreateCommand({
+    name: "close",
+    takes: {},
+    description: "Close the current window",
+    author: {},
+    icon: "",
+    homepage: "",
+    license: "",
+    preview: "Close the current window",
+    execute: function (directObj) {
+        CmdUtils.toggleUbiquityWindow();
+        CmdUtils.closeWindow();
+    }
+});
+
+CmdUtils.CreateCommand({
+    name: "clusty",
+    takes: {"search_string": noun_arb_text},
+    description: "Perform a clustered search through clusty.com",
+    author: {},
+    icon: "http://clusty.com/images/clusty-favicon.ico",
+    homepage: "",
+    license: "",
+    preview: "Perform a clustered search through clusty.com",
+    execute: CmdUtils.SimpleUrlBasedCommand(
+        "http://clusty.com/search?query={text}"
+    )
 });
 
 CmdUtils.CreateCommand({
     name: "code-search",
     takes: {"search_string": noun_arb_text},
-    description: "Searches any source code for the given string",
+    description: "Search any source code for the given string",
     author: { name: "Cosimo Streppone", email: "cosimo@cpan.org" },
     icon: "http://www.google.com/favicon.ico",
     homepage: "http://codesearch.google.com",
     license: "",
-    preview: "Searches any source code for the given string",
+    preview: "Search any source code for the given string",
+    execute: CmdUtils.SimpleUrlBasedCommand(
+        'http://www.google.com/codesearch?client=opera&sourceid=opera&q={text}'
+    )
+});
+
+CmdUtils.CreateCommand({
+    name: "command-list",
+    takes: {},
+    description: "Shows the list of Ubiquity commands and what they do",
+    author: {},
+    icon: "",
+    homepage: "",
+    license: "",
+    preview: "Shows the list of Ubiquity commands and what they do",
     execute: function (directObj) {
-        var search_string = encodeURIComponent(directObj.text);
-        Utils.openUrlInBrowser('http://www.google.com/codesearch?client=opera&sourceid=opera&q=' + search_string);
+        ubiq_show_matching_commands('*all');
     }
 });
 
 CmdUtils.CreateCommand({
-  name: "torrent-search",
-  takes: {"search_string": noun_arb_text},
-
-  description: "Searches PirateBay, Isohunt, and Torrentz in new tabs.",
-
-  author: { name: "Axel Boldt", email: "axelboldt@yahoo.com"},
-  homepage: "http://math-www.uni-paderborn.de/~axel/",
-  license: "Public domain",
-
-  preview: "Searches for torrent on PirateBay, Isohunt and Torrentz.",
-  execute: function( directObj ) {
-    var search_string = encodeURIComponent(directObj.text);
-    Utils.openUrlInBrowser( "http://thepiratebay.org/search.php?q=" + search_string);
-    Utils.openUrlInBrowser( "http://isohunt.com/torrents/?ihq=" + search_string);
-    Utils.openUrlInBrowser( "http://www.torrentz.com/search?q=" + search_string);
-   }
+    name: "define",
+    takes: {"search_string": noun_arb_text},
+    description: "Gives the definition of a word",
+    author: {},
+    icon: "http://www.ask.com/favicon.ico",
+    homepage: "",
+    license: "",
+    preview: "Gives the definition of a word",
+    execute: CmdUtils.SimpleUrlBasedCommand('http://www.ask.com/web?q={text}')
 });
 
 CmdUtils.CreateCommand({
-  name: "validate",
-  icon: "http://www.imageboo.com/files/uhee2ii315oxd8akq0nm.ico",
-  description: "Checks the markup validity of the current Web document",
-  preview: "Sends this page to the W3C validator",
-  execute: function() {
-    var url = "http://validator.w3.org/check?uri=" + Application.activeWindow.activeTab.document.location.href;
-    Utils.openUrlInBrowser( url );
-  }
-})
+    name: "dramatic-chipmunk",
+    takes: {},
+    description: "Prepare for a dramatic moment of your life",
+    author: {},
+    icon: "http://www.youtube.com/favicon.ico",
+    homepage: "",
+    license: "",
+    preview: "Prepare for a dramatic moment of your life",
+    execute: CmdUtils.SimpleUrlBasedCommand(
+        "http://www.youtube.com/watch?v=a1Y73sPHKxw"
+    )
+});
+        
+CmdUtils.CreateCommand({
+    name: "ebay-search",
+    takes: {"search_string": noun_arb_text},
+    description: "Search ebay for the given words",
+    author: {},
+    icon: "http://ebay.com/favicon.ico",
+    homepage: "",
+    license: "",
+    preview: "Search ebay for the given words",
+    execute: CmdUtils.SimpleUrlBasedCommand(
+        "http://search.ebay.com/search/search.dll?satitle={text}"
+    )
+});
+
+CmdUtils.CreateCommand({
+    name: "flickr",
+    takes: {"search_string": noun_arb_text},
+    description: "Search photos on Flickr",
+    author: {},
+    icon: "http://flickr.com/favicon.ico",
+    homepage: "",
+    license: "",
+    preview: "Search photos on Flickr",
+    execute: CmdUtils.SimpleUrlBasedCommand(
+        "http://www.flickr.com/search/?q={text}&w=all"
+    )
+});
+        
+CmdUtils.CreateCommand({
+    name: "gcalculate",
+    takes: {"expression": noun_arb_text},   // FIXME a different type?
+    description: "Examples: 3^4/sqrt(2)-pi,  3 inch in cm,  speed of light,  0xAF in decimal (<a href=\"http://www.googleguide.com/calculator.html\">Command list</a>)",
+    author: {},
+    icon: "http://www.google.com/favicon.ico",
+    homepage: "",
+    license: "",
+    preview: "Examples: 3^4/sqrt(2)-pi,  3 inch in cm,  speed of light,  0xAF in decimal (<a href=\"http://www.googleguide.com/calculator.html\">Command list</a>)",
+    execute: CmdUtils.SimpleUrlBasedCommand(
+        "http://www.google.com/search?client=opera&num=1&q={text}&sourceid=opera&ie=utf-8&oe=utf-8"
+    )
+});
+        
+CmdUtils.CreateCommand({
+    name: "google-search",
+    takes: {"search_string": noun_arb_text},
+    description: "Search on Google for the given words",
+    author: {},
+    icon: "http://www.google.com/favicon.ico",
+    homepage: "",
+    license: "",
+    preview: "Search on Google for the given words",
+    execute: CmdUtils.SimpleUrlBasedCommand(
+        "http://www.google.com/search?client=opera&num=1&q={text}&sourceid=opera&ie=utf-8&oe=utf-8"
+    )
+});
+
+CmdUtils.CreateCommand({
+    name: "help",
+    takes: {},
+    description: "Provides basic help on using Ubiquity for Opera",
+    author: {},
+    icon: "",
+    homepage: "",
+    license: "",
+    preview: "Provides basic help on using Ubiquity for Opera",
+    execute: CmdUtils.SimpleUrlBasedCommand(
+        "http://people.opera.com/cosimo/ubiquity/help.html"
+    )
+});
+
+CmdUtils.CreateCommand({
+    name: "image-search",
+    takes: {"search_string": noun_arb_text},
+    description: "Search on Google for images",
+    author: {},
+    icon: "http://www.google.com/favicon.ico",
+    homepage: "",
+    license: "",
+    preview: "Search on Google for images",
+    execute: CmdUtils.SimpleUrlBasedCommand(
+        "http://images.google.com/images?hl=en&q={text}&client=opera&sourceid=opera"
+    )
+});
+
+CmdUtils.CreateCommand({
+    name: "imdb",
+    takes: {"search_string": noun_arb_text},
+    description: "Searches for movies on IMDb",
+    author: {},
+    icon: "http://www.imdb.com/favicon.ico",
+    homepage: "",
+    license: "",
+    preview: "Searches for movies on IMDb",
+    execute: CmdUtils.SimpleUrlBasedCommand(
+        "http://www.imdb.com/find?s=all&q={text}&x=0&y=0"
+    )
+});
+
+CmdUtils.CreateCommand({
+    name: "lastfm",
+    takes: {"search_string": noun_arb_text},
+    description: "Listen to some artist radio on Last.fm",
+    author: {},
+    icon: "http://last.fm/favicon.ico",
+    homepage: "",
+    license: "",
+    preview: "Listen to some artist radio on Last.fm",
+    execute: CmdUtils.SimpleUrlBasedCommand(
+        "http://www.lastfm.com/listen/artist/{text}/similarartists"
+    )
+});
+
+CmdUtils.CreateCommand({
+    name: "maps",
+    takes: {"address": noun_arb_text},
+    description: "Shows a location on the map",
+    author: {},
+    icon: "http://www.google.com/favicon.ico",
+    homepage: "",
+    license: "",
+    preview: "Shows a location on the map",
+    execute: CmdUtils.SimpleUrlBasedCommand(
+        "http://maps.google.com/maps?q={text}"
+    )
+});
+
+CmdUtils.CreateCommand({
+    name: "msn-search",
+    takes: {"search_string": noun_arb_text},
+    description: "Search MSN for the given words",
+    author: {},
+    icon: "http://www.msn.com/favicon.ico",
+    homepage: "",
+    license: "",
+    preview: "Searches MSN for the given words",
+    execute: CmdUtils.SimpleUrlBasedCommand(
+        "http://search.msn.com/results.aspx?q={text}"
+    )
+});
+        
+CmdUtils.CreateCommand({
+    name: "myopera-blog-search",
+    takes: {"search_string": noun_arb_text},
+    description: "Search for blogs on the My Opera Community",
+    author: { name: "Cosimo Streppone", email: "cosimo@cpan.org" },
+    icon: "http://static.myopera.com/community/favicon.ico",
+    homepage: "http://my.opera.com",
+    license: "",
+    preview: "Search for blogs on the My Opera Community",
+    execute: CmdUtils.SimpleUrlBasedCommand(
+        "http://my.opera.com/community/blogs/?search={text}"
+    )
+});
+
+CmdUtils.CreateCommand({
+    name: "myopera-photo-search",
+    takes: {"search_string": noun_arb_text},
+    description: "Search for photos on the My Opera Community",
+    author: { name: "Cosimo Streppone", email: "cosimo@cpan.org" },
+    icon: "http://static.myopera.com/community/favicon.ico",
+    homepage: "http://my.opera.com",
+    license: "",
+    preview: "Search for photos on the My Opera Community",
+    execute: CmdUtils.SimpleUrlBasedCommand(
+        "http://my.opera.com/community/photos/?search={text}"
+    )
+});
+
+CmdUtils.CreateCommand({
+    name: "new-tab",
+    takes: {"URL": noun_arb_text},  // FIXME URL type??
+    description: "Open a new tab (or window) with the specified URL",
+    author: {},
+    icon: "",
+    homepage: "",
+    license: "",
+    preview: "Open a new tab (or window) with the specified URL",
+    execute: function (directObj) {
+        var url = 'about:';
+        if (directObj) {
+            url = directObj.text;
+        }    
+        CmdUtils.toggleUbiquityWindow();
+        window.open(url);
+    }
+});
+
+CmdUtils.CreateCommand({
+    name: "opera-cache",
+    takes: {},
+    description: "Show Opera browser cache contents",
+    author: { name: "Cosimo Streppone", email: "cosimo@cpan.org" },
+    icon: "http://www.opera.com/favicon.ico",
+    homepage: "http://www.opera.com",
+    license: "",
+    preview: "Show Opera browser cache contents",
+    execute: CmdUtils.SimpleUrlBasedCommand("opera:cache")
+});
+
+CmdUtils.CreateCommand({
+    name: "opera-config",
+    takes: { "config_option": noun_arb_text },
+    description: "Show Opera browser preferences (filtered by given words)",
+    author: { name: "Cosimo Streppone", email: "cosimo@cpan.org" },
+    icon: "http://www.opera.com/favicon.ico",
+    homepage: "http://www.opera.com",
+    license: "",
+    preview: "Show Opera browser preferences (filtered by given words)",
+    execute: CmdUtils.SimpleUrlBasedCommand(
+        "opera:config#{text}"
+    )
+});
+
+CmdUtils.CreateCommand({
+    name: "opera-skins",
+    takes: {"search_string": noun_arb_text},
+    description: "Search for Opera browser skins on the My Opera Community",
+    author: { name: "Cosimo Streppone", email: "cosimo@cpan.org" },
+    icon: "http://static.myopera.com/community/favicon.ico",
+    homepage: "http://my.opera.com/community/customize/skins/",
+    license: "",
+    preview: "Search for Opera browser skins on the My Opera Community",
+    execute: CmdUtils.SimpleUrlBasedCommand(
+        "http://my.opera.com/community/customize/skins/?search={text}"
+    )
+});
+
+CmdUtils.CreateCommand({
+    name: "print",
+    takes: {},
+    description: "Print the current page",
+    author: {},
+    icon: "",
+    homepage: "",
+    license: "",
+    preview: "Print the current page",
+    execute: function (directObj) {
+        CmdUtils.toggleUbiquityWindow();
+        window.print();
+    }
+});
+
+CmdUtils.CreateCommand({
+    name: "refresh",
+    takes: {},
+    description: "Reloads the current document",
+    author: {},
+    icon: "",
+    homepage: "",
+    license: "",
+    preview: "Reloads the current document",
+    execute: function (directObj) {
+        CmdUtils.toggleUbiquityWindow();
+        CmdUtils.getLocation().reload();
+    }
+});
+
+CmdUtils.CreateCommand({
+    name: "search",
+    takes: {"search_string": noun_arb_text},
+    description: "Search on Google for the given words",
+    author: {},
+    icon: "http://www.google.com/favicon.ico",
+    homepage: "",
+    license: "",
+    preview: "Search on Google for the given words",
+    execute: CmdUtils.SimpleUrlBasedCommand(
+        "http://www.google.com/search?client=opera&num=1&q={text}&sourceid=opera&ie=utf-8&oe=utf-8"
+    )
+});
+
+CmdUtils.CreateCommand({
+    name: "stackoverflow-search",
+    takes: {"search_string": noun_arb_text},
+    description: "Searches questions and answers on stackoverflow.com",
+    author: { name: "Cosimo Streppone", email: "cosimo@cpan.org" },
+    icon: "http://stackoverflow.com/favicon.ico",
+    homepage: "",
+    license: "",
+    preview: "Searches questions and answers on stackoverflow.com",
+    execute: CmdUtils.SimpleUrlBasedCommand(
+        "http://stackoverflow.com/search?q={text}"
+    )
+});
+
+CmdUtils.CreateCommand({
+    name: "torrent-search",
+    takes: { "search_string": noun_arb_text },
+    description: "Search PirateBay, Isohunt, and Torrentz in new tabs.",
+    author: { name: "Axel Boldt", email: "axelboldt@yahoo.com"},
+    homepage: "http://math-www.uni-paderborn.de/~axel/",
+    license: "Public domain",
+    preview: "Search for torrent on PirateBay, Isohunt and Torrentz.",
+    execute: function( directObj ) {
+        var search_string = encodeURIComponent(directObj.text);
+        Utils.openUrlInBrowser( "http://thepiratebay.org/search.php?q=" + search_string);
+        Utils.openUrlInBrowser( "http://isohunt.com/torrents/?ihq=" + search_string);
+        Utils.openUrlInBrowser( "http://www.torrentz.com/search?q=" + search_string);
+    }
+});
+
+CmdUtils.CreateCommand({
+    name: "translate",
+    takes: { "words": noun_arb_text },
+    description: "Translates the given words (or text selection, or the current window) to English",
+    author: {},
+    icon: "http://www.google.com/favicon.ico",
+    homepage: "",
+    license: "",
+    preview: "Translates the given words (or text selection, or the current window) to English",
+    execute: function (directObj) {
+        CmdUtils.toggleUbiquityWindow();
+        var text = directObj.text;
+        // HARD !!!
+        //alert(ubiq_element.innerHTML);
+        //var html = ubiq_element.innerHTML.replace(text, 'blah blah blah');
+        //ubiq_element.innerHTML = html;
+        var words = text.split(/\s+/);
+        var dest = 'auto';
+
+        // Detect the destination language ("translate ... to it")
+        if (words.length >= 3 && words[words.length - 2].toLowerCase()=='to') {
+            // Get destination language
+            dest = words.pop();
+            // Remove the 'to'
+            words.pop();
+            // Update the text to be translated
+            text = words.join('');
+        }
+
+        // Translate text or current URL
+        var url = 'http://translate.google.com/translate_t?#auto|'+dest+'|';
+        if (! text || text.length == 0 || text.match('^https?://')) {
+            if (! text) text = CmdUtils.getLocation();
+            url = 'http://translate.google.com/translate?prev=_t&ie=UTF-8&sl=auto&tl='+dest+'&history_state0=&u=';
+        }
+        CmdUtils.openWindow(url+text);
+    }
+});
+
+CmdUtils.CreateCommand({
+    name: "validate",
+    icon: "http://www.imageboo.com/files/uhee2ii315oxd8akq0nm.ico",
+    description: "Checks the markup validity of the current Web document",
+    preview: "Sends this page to the W3C validator",
+    execute: CmdUtils.SimpleUrlBasedCommand(
+        "http://validator.w3.org/check?uri={location}"
+    )
+});
 
 CmdUtils.CreateCommand({  
       name: "wayback",  
       homepage: "http://www.pendor.com.ar/ubiquity",  
       author: { name: "Juan Pablo Zapata", email: "admin@pendor.com.ar" },  
-      description: "Busca versiones antiguas de un sitio usando Wayback Machine de Internet Archive (archive.org)",  
+      description: "Search old versions of a site using the Wayback Machine (archive.org)",
       help: "wayback <i>sitio a buscar</i>", 
       icon: "http://web.archive.org/favicon.ico", 
-      takes: {"Sitio a buscar": noun_arb_text},  
+      takes: {"Site to search": noun_arb_text},  
       preview: function(pblock, theShout) {  
           pblock.innerHTML = "Buscar versiones antiguas del sitio <b>" +  theShout.text + "</b>"          
       },
-      execute: function( theShout ) {  
-          var searchUrl = "http://web.archive.org/web/*/" + theShout.text;  
-          Utils.openUrlInBrowser(searchUrl);  
-      }
+      execute: CmdUtils.SimpleUrlBasedCommand(
+          "http://web.archive.org/web/*/{text}"
+      )
+});
+
+CmdUtils.CreateCommand({
+    name: "weather",
+    takes: {"location": noun_arb_text},
+    description: "Show the weather forecast for",
+    author: {},
+    icon: "http://www.accuweather.com/favicon.ico",
+    homepage: "",
+    license: "",
+    preview: "Show the weather forecast for",
+    execute: CmdUtils.SimpleUrlBasedCommand(
+        "http://www.wunderground.com/cgi-bin/findweather/getForecast?query={text}"
+    )
+});
+
+CmdUtils.CreateCommand({
+    name: "wikipedia",
+    takes: {"search_string": noun_arb_text},
+    description: "Search Wikipedia for the given words",
+    author: {},
+    icon: "http://en.wikipedia.org/favicon.ico",
+    homepage: "",
+    license: "",
+    preview: "Search Wikipedia for the given words",
+    execute: CmdUtils.SimpleUrlBasedCommand(
+        "http://en.wikipedia.org/wiki/Special:Search?search={text}"
+    )
+});
+
+CmdUtils.CreateCommand({
+    name: "yahoo-answers",
+    takes: {"question": noun_arb_text},
+    description: "Search Yahoo! Answers for",
+    author: {},
+    icon: "http://l.yimg.com/a/i/us/sch/gr/answers_favicon.ico",
+    homepage: "",
+    license: "",
+    preview: "Search Yahoo! Answers for",
+    execute: CmdUtils.SimpleUrlBasedCommand(
+        "http://answers.yahoo.com/search/search_result;_ylv=3?p={text}"
+    )
+});
+
+CmdUtils.CreateCommand({
+    name: "yahoo-search",
+    takes: {"search_string": noun_arb_text},
+    description: "Search Yahoo! for",
+    author: {},
+    icon: "http://www.yahoo.com/favicon.ico",
+    homepage: "",
+    license: "",
+    preview: "Search Yahoo! for",
+    execute: CmdUtils.SimpleUrlBasedCommand(
+        "http://search.yahoo.com/search?p={text}&ei=UTF-8"
+    )
+});
+
+CmdUtils.CreateCommand({
+    name: "youtube",
+    takes: {"videos": noun_arb_text},
+    description: "Search for videos on YouTube",
+    author: {},
+    icon: "http://www.youtube.com/favicon.ico",
+    homepage: "",
+    license: "",
+    preview: "Search for videos on YouTube",
+    execute: CmdUtils.SimpleUrlBasedCommand(
+        "http://www.youtube.com/results?search_type=search_videos&search_sort=relevance&search_query={text}&search=Search"
+    )
 });
 
 // vim: ts=4 sw=4 tw=0 et
