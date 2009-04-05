@@ -1,36 +1,76 @@
-/*
-Ubiquity for Opera? A nightly experiment...
-----------------------------------------------
-
-An attempt to rewrite Firefox's Ubiquity extension
-for Opera using UserJS.
-
-Original Ubiquity Project: http://labs.mozilla.org/ubiquity/
-
-To use this in Opera, you have to:
-
-* Enable UserJS. Point your browser to opera:config#Javascript and:
-
-  - tick "User Javascript" checkbox
-  - type the folder you want to run the scripts from
-    in the "User Javascript File" textfield
-
-  If you want, you can also allow UserJS execution in
-  HTTPS pages.
-
-* Remove the default shortcut key bound to CTRL + SPACE,
-  since the original Ubiquity is activated and deactivated
-  with CTRL + SPACE.
-
-Have fun!
-
-----------------------------------------------
-Cosimo Streppone, <cosimo@opera.com>
-First version: 19/01/2009
-*/
-
+//
+// Ubiquity for Opera? A nightly experiment...
+// -------------------------------------------
+//
+// An attempt to rewrite Firefox's Ubiquity extension
+// for Opera using UserJS.
+//
+// Original Ubiquity Project: http://labs.mozilla.org/ubiquity/
+//
+// To use this in Opera, you have to:
+//
+// * Enable UserJS. Point your browser to opera:config#Javascript and:
+//
+//  - tick "User Javascript" checkbox
+//  - type the folder you want to run the scripts from
+//    in the "User Javascript File" textfield
+//
+//  If you want, you can also allow UserJS execution in
+//  HTTPS pages.
+//
+// * Remove the default shortcut key bound to CTRL + SPACE,
+//   since the original Ubiquity is activated and deactivated
+//   with CTRL + SPACE.
+//
+// Have fun!
+//
+// ----------------------------------------------
+// Cosimo Streppone, <cosimo@opera.com>
+// First version: 19/01/2009
+//
+//
 // $Id$
 ;
+
+// -----------------------------------------------
+//
+//       Firefox Ubiquity emulation layer
+//
+// -----------------------------------------------
+
+//
+// CmdUtils
+//
+if (CmdUtils == undefined) var CmdUtils = {}
+noun_arb_text = 1;
+CmdUtils.VERSION = 0.01;
+CmdUtils.CommandList = new Array();
+CmdUtils.CreateCommand = function (args) {
+	var cmd_name = args['name'];
+	var cmd_list = CmdUtils.CommandList;
+	if (cmd_name in cmd_list) {
+		return;
+	}
+	CmdUtils.CommandList.push(args);
+}
+
+//
+// Utils
+//
+if (Utils==undefined) var Utils = {}
+Utils.openUrlInBrowser = function(url) {
+	window.open(url);
+};
+
+//
+// Application
+//
+if (Application==undefined) var Application = {
+	activeWindow: {
+		activeTab: window
+	}
+}
+
 var ubiq_window;
 var ubiq_selection;
 var ubiq_element;
@@ -695,5 +735,88 @@ function ubiq_select_next_command () {
 
 /* Add event handler to window */
 window.opera.addEventListener('afterEvent.keyup', ubiq_key_handler, false);
+
+//--------------------------------------------------------
+//
+//               Command definitions
+//
+//--------------------------------------------------------
+
+CmdUtils.CreateCommand({
+    name: "amazon-search",
+    takes: {"search_string": noun_arb_text},
+    description: "Searches Amazon for books matching:",
+    author: { name: "Cosimo Streppone", email: "cosimo@cpan.org" },
+    icon: "http://www.amazon.com/favicon.ico",
+    homepage: "",
+    license: "",
+    preview: "Searches Amazon for books matching:",
+    execute: function (directObj) {
+        var search_string = encodeURIComponent(directObj.text);
+        Utils.openUrlInBrowser('http://www.amazon.com/s/ref=nb_ss_gw?url=search-alias%3Dstripbooks&field-keywords=' + search_string);
+    }
+});
+
+CmdUtils.CreateCommand({
+    name: "code-search",
+    takes: {"search_string": noun_arb_text},
+    description: "Searches any source code for the given string",
+    author: { name: "Cosimo Streppone", email: "cosimo@cpan.org" },
+    icon: "http://www.google.com/favicon.ico",
+    homepage: "http://codesearch.google.com",
+    license: "",
+    preview: "Searches any source code for the given string",
+    execute: function (directObj) {
+        var search_string = encodeURIComponent(directObj.text);
+        Utils.openUrlInBrowser('http://www.google.com/codesearch?client=opera&sourceid=opera&q=' + search_string);
+    }
+});
+
+CmdUtils.CreateCommand({
+  name: "torrent-search",
+  takes: {"search_string": noun_arb_text},
+
+  description: "Searches PirateBay, Isohunt, and Torrentz in new tabs.",
+
+  author: { name: "Axel Boldt", email: "axelboldt@yahoo.com"},
+  homepage: "http://math-www.uni-paderborn.de/~axel/",
+  license: "Public domain",
+
+  preview: "Searches for torrent on PirateBay, Isohunt and Torrentz.",
+  execute: function( directObj ) {
+    var search_string = encodeURIComponent(directObj.text);
+    Utils.openUrlInBrowser( "http://thepiratebay.org/search.php?q=" + search_string);
+    Utils.openUrlInBrowser( "http://isohunt.com/torrents/?ihq=" + search_string);
+    Utils.openUrlInBrowser( "http://www.torrentz.com/search?q=" + search_string);
+   }
+});
+
+CmdUtils.CreateCommand({
+  name: "validate",
+  icon: "http://www.imageboo.com/files/uhee2ii315oxd8akq0nm.ico",
+  description: "Checks the markup validity of the current Web document",
+  preview: "Sends this page to the W3C validator",
+  execute: function() {
+    var url = "http://validator.w3.org/check?uri=" + Application.activeWindow.activeTab.document.location.href;
+    Utils.openUrlInBrowser( url );
+  }
+})
+
+CmdUtils.CreateCommand({  
+      name: "wayback",  
+      homepage: "http://www.pendor.com.ar/ubiquity",  
+      author: { name: "Juan Pablo Zapata", email: "admin@pendor.com.ar" },  
+      description: "Busca versiones antiguas de un sitio usando Wayback Machine de Internet Archive (archive.org)",  
+      help: "wayback <i>sitio a buscar</i>", 
+      icon: "http://web.archive.org/favicon.ico", 
+      takes: {"Sitio a buscar": noun_arb_text},  
+      preview: function(pblock, theShout) {  
+          pblock.innerHTML = "Buscar versiones antiguas del sitio <b>" +  theShout.text + "</b>"          
+      },
+      execute: function( theShout ) {  
+          var searchUrl = "http://web.archive.org/web/*/" + theShout.text;  
+          Utils.openUrlInBrowser(searchUrl);  
+      }
+});
 
 // vim: ts=4 sw=4 tw=0 et
