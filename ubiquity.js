@@ -634,6 +634,20 @@ CmdUtils.CreateCommand({
 });
 
 CmdUtils.CreateCommand({
+  name: "cpan",
+  icon: "http://search.cpan.org/favicon.ico",
+  description: "Search for a CPAN package information",
+  homepage: "",
+  author: { name: "Cosimo Streppone", email: "cosimo@cpan.org"},
+  license: "",
+  takes: {"package_name": noun_arb_text},
+  preview: "Search for a CPAN package information",
+  execute: CmdUtils.SimpleUrlBasedCommand(
+    "http://search.cpan.org/dist/{text}"
+  )
+});
+
+CmdUtils.CreateCommand({
   name: "dictionary",
   description: "Gives the meaning of a word.",
   author: { name: "Isidoros Passadis", email: "isidoros.passadis@gmail.com"},
@@ -931,6 +945,20 @@ CmdUtils.CreateCommand({
     execute: CmdUtils.SimpleUrlBasedCommand(
         "http://www.google.com/search?client=opera&num=1&q={text}&sourceid=opera&ie=utf-8&oe=utf-8"
     )
+});
+
+CmdUtils.CreateCommand({
+  name: "slideshare",
+  icon: "http://www.slideshare.com/favicon.ico",
+  description: "Search for online presentations on SlideShare",
+  homepage: "",
+  author: { name: "Cosimo Streppone", email: "cosimo@cpan.org"},
+  license: "",
+  takes: {"search_term": noun_arb_text},
+  preview: "Search for online presentations on SlideShare",
+  execute: CmdUtils.SimpleUrlBasedCommand(
+    "http://www.slideshare.net/search/slideshow?q={text}&submit=post&searchfrom=header&x=0&y=0"
+  )
 });
 
 CmdUtils.CreateCommand({
