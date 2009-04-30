@@ -31,6 +31,10 @@
 // $Id$
 ;
 
+(function (opera) {
+
+if (! opera) return;
+
 // -----------------------------------------------
 //
 //       Firefox Ubiquity emulation layer
@@ -40,6 +44,7 @@
 //
 // CmdUtils
 //
+
 if (CmdUtils == undefined) var CmdUtils = {}
 noun_arb_text = 1;
 CmdUtils.VERSION = 0.01;
@@ -52,18 +57,10 @@ CmdUtils.CreateCommand = function CreateCommand (args) {
 	}
 	CmdUtils.CommandList.push(args);
 }
-CmdUtils.closeWindow = function closeWindow () {
-    CmdUtils.getWindow().close();
-}
-CmdUtils.getDocument = function getDocument () {
-    return document;
-}
-CmdUtils.getLocation = function getLocation () {
-    return CmdUtils.getDocument().location;
-}
-CmdUtils.getWindow = function getWindow () {
-    return window;
-}
+CmdUtils.closeWindow = function closeWindow () { CmdUtils.getWindow().close(); }
+CmdUtils.getDocument = function getDocument () { return document; }
+CmdUtils.getLocation = function getLocation () { return CmdUtils.getDocument().location; }
+CmdUtils.getWindow = function getWindow () { return window; }
 CmdUtils.openWindow = function openWindow (url,name) {
     if (!name) {
         CmdUtils.getWindow().open(url);
@@ -71,7 +68,7 @@ CmdUtils.openWindow = function openWindow (url,name) {
         CmdUtils.getWindow().open(url, name);
     }
 }
-// Search 2nd order function
+// 2nd order function
 CmdUtils.SimpleUrlBasedCommand = function SimpleUrlBasedCommand (url) {
     if (! url) return;
     var search_func = function (directObj) {
@@ -173,6 +170,35 @@ function ubiq_start_mode () {
         ;
     return html;
 }
+
+function ubiq_show_preview (cmd) {
+    var el = document.getElementById('ubiq-command-preview');
+    if (! el) return;
+    if (! cmd) {
+        el.innerHTML = '';
+        return;
+    }
+    preview_func = CmdUtils.CommandList[cmd]['preview'];
+    if (typeof preview_func == 'string') {
+        el.innerHTML = preview_func;
+    } 
+    else {
+        var directObj = {
+            text: ubiq_command(),
+        };
+        preview_func(el, directObj);
+    }
+    return;
+}
+
+//  ubiq_xml_http(url, function(ajax){
+//      if (! ajax) return;
+//      var text=ajax.responseText;
+//      if (! text) return;
+//      var preview_block=document.getElementById('ubiq-command-preview');
+//      if (! preview_block) return;
+//      preview_block.innerHTML=text;
+//  });
 
 function ubiq_show_tip (tip) {
     var el = document.getElementById('ubiq-command-tip');
@@ -402,6 +428,7 @@ function ubiq_show_matching_commands (text) {
         suggestions_list.style = 'padding:0; margin:0';
 
         ubiq_show_tip(matches[ubiq_selected_command]);
+        //ubiq_show_preview(matches[ubiq_selected_command]);
 
         for (var c in matches) {
             var is_selected = (c == ubiq_selected_command);
@@ -425,6 +452,7 @@ function ubiq_show_matching_commands (text) {
 
         suggestions_div.appendChild(suggestions_list);
         results_panel.innerHTML = suggestions_div.innerHTML;
+
     }
     else {
         ubiq_selected_command = -1;
@@ -498,8 +526,38 @@ function ubiq_select_next_command () {
     ubiq_selected_command++;
 }
 
-// Add event handler to window 
-window.opera.addEventListener('afterEvent.keyup', ubiq_key_handler, false);
+function ubiq_xml(node){
+    return (node && node.nodeType) ? new XMLSerializer().serializeToString(node):'('+node+')';
+}
+
+function ubiq_xml_http (url,callback) {
+  var xmlhttp = new opera.XMLHttpRequest();
+  xmlhttp.onreadystatechange = function(){
+    var s = ''+this+'\n';
+    s += 'status: '+this.status+'\n';
+    s += 'statusText: '+this.statusText+'\n\n';
+    s += 'allheaders: '+this.getAllResponseHeaders()+'\n\n';
+    s += 'responseText: '+this.responseText+'\n\n';
+    s += 'responseXML: '+(ubiq_xml(this.responseXML))+'\n\n';
+    var obj = {
+        status: this.status,
+        statusText: this.statusText,
+        allheaders: this.getAllResponseHeaders(),
+        responseText: this.responseText,
+        responseXML: ubiq_xml(this.responseXML),
+    };
+    callback(obj);
+  }
+  xmlhttp.onload = function(){};
+  //
+  //  var obj = document.getElementById(elem);
+  //  if (! obj) return;
+  //  obj.innerHTML='';
+  //  obj.style.display='';
+  //}
+  xmlhttp.open('GET',url,true);
+  xmlhttp.send('a=b&c=d');
+}
 
 //--------------------------------------------------------
 //
@@ -1135,32 +1193,58 @@ CmdUtils.CreateCommand({
 // From Ubiquity feed:
 // https://ubiquity.mozilla.com/herd/all-feeds/9b0b1de981e80b6fcfee0659ffdbb478d9abc317-4742/
 //
+// Modified to get the current window domain
+//
 CmdUtils.CreateCommand({
-  name: "isdown",
-  icon: "http://downforeveryoneorjustme.com/favicon.ico",
-  description: "Check if selected/typed URL is down",
-  homepage: "http://www.andyfilms.net",
-  author: { name: "Andy Jarosz", email: "andyfilms1@yahoo.com"},
-  license: "GPL",
-  takes: {URL: noun_arb_text},
-  preview: function(pblock, directObject) {
-    searchText = jQuery.trim(directObject.text);
-    if(searchText.length < 1) {
-      pblock.innerHTML = "Checks if URL is down";
-      return;
+    name: "isdown",
+    icon: "http://downforeveryoneorjustme.com/favicon.ico",
+    description: "Check if selected/typed URL is down",
+    homepage: "http://www.andyfilms.net",
+    author: { name: "Andy Jarosz", email: "andyfilms1@yahoo.com"},
+    license: "GPL",
+    takes: {URL: noun_arb_text},
+    preview: function(pblock, directObject) {
+        //ubiq_show_preview(urlString);
+        //searchText = jQuery.trim(directObject.text);
+        searchText = directObject.text;
+        var words = searchText.split(' ');
+        var host = words[1];
+        if(searchText.length < 1) {
+            pblock.innerHTML = "Checks if URL is down";
+            return;
+        }
+        var previewTemplate = "Checks if <b>" + host + "</b> is down";
+        pblock.innerHTML = previewTemplate;
+    },
+    execute: function(directObject) {
+        var url = "http://downforeveryoneorjustme.com/{QUERY}"
+        var query = directObject.text;
+        // Get the hostname from url
+        if (! query) {
+            var host = window.location.href;
+            var url_comp = host.split('/');
+            query = url_comp[2];
+        }
+        var urlString = url.replace("{QUERY}", query);
+        Utils.openUrlInBrowser(urlString);
+        //ubiq_xml_http(urlString, function (ajax) {
+        //    if (! ajax) return;
+        //    var text = ajax.responseText;
+        //    if (! text) return;
+        //    var pblock = document.getElementById('ubiq-command-preview');
+        //    if (text.match('is up.')) {
+        //        pblock.innerHTML = '<br/><p style="font-size: 18px;">It\'s just you. The site is <b>up!</b></p>';
+        //    } else {
+        //        pblock.innerHTML = '<br/><p style="font-size: 18px;">It\'s <b>not</b> just you. The site is <b>down!</b></p>';
+        //    }
+        //});
     }
-    var previewTemplate = "Checks is <b>${query}</b> is down";
-    var previewData = {query: searchText};
-    pblock.innerHTML = CmdUtils.renderTemplate(previewTemplate, previewData);
-
-  },
-  execute: function(directObject) {
-    var url = "http://downforeveryoneorjustme.com/{QUERY}"
-    var query = directObject.text;
-    var urlString = url.replace("{QUERY}", query);
-    Utils.openUrlInBrowser(urlString);
-  }
 });
+
+// Add event handler to window 
+opera.addEventListener('afterEvent.keyup', ubiq_key_handler, false);
+
+}) (window.opera);
 
 // vim: ts=4 sw=4 tw=0 et
 
