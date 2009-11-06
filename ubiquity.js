@@ -1559,6 +1559,20 @@
     });
 
     CmdUtils.CreateCommand({
+        name: "instant-rimshot",
+        takes: {},
+        description: "Instant Rimshot at your fingertips!",
+        author: {},
+        icon: "",
+        homepage: "http://instantrimshot.com",
+        license: "",
+        preview: "Instant Rimshot at your fingertips!",
+        execute: CmdUtils.SimpleUrlBasedCommand(
+            "http://instantrimshot.com"
+        )
+    });
+
+    CmdUtils.CreateCommand({
         name: "lastfm",
         takes: {"search_string": noun_arb_text},
         description: "Listen to some artist radio on Last.fm",
