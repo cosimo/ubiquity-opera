@@ -1568,7 +1568,7 @@
         license: "",
         preview: "Instant Rimshot at your fingertips!",
         execute: CmdUtils.SimpleUrlBasedCommand(
-            "http://instantrimshot.com"
+            "http://instantrimshot.com/rimshot.swf"
         )
     });
 
