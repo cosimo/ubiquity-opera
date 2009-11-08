@@ -1966,18 +1966,18 @@
                 query = url_comp[2];
             }
             var urlString = url.replace("{QUERY}", query);
-            Utils.openUrlInBrowser(urlString);
-            //ubiq_xml_http(urlString, function (ajax) {
-            //    if (! ajax) return;
-            //    var text = ajax.responseText;
-            //    if (! text) return;
-            //    var pblock = document.getElementById('ubiq-command-preview');
-            //    if (text.match('is up.')) {
-            //        pblock.innerHTML = '<br/><p style="font-size: 18px;">It\'s just you. The site is <b>up!</b></p>';
-            //    } else {
-            //        pblock.innerHTML = '<br/><p style="font-size: 18px;">It\'s <b>not</b> just you. The site is <b>down!</b></p>';
-            //    }
-            //});
+            //Utils.openUrlInBrowser(urlString);
+            ubiq_xml_http(urlString, function (ajax) {
+                if (! ajax) return;
+                var text = ajax.responseText;
+                if (! text) return;
+                var pblock = document.getElementById('ubiq-command-preview');
+                if (text.match('is up.')) {
+                    pblock.innerHTML = '<br/><p style="font-size: 18px;">It\'s just you. The site is <b>up!</b></p>';
+                } else {
+                    pblock.innerHTML = '<br/><p style="font-size: 18px;">It\'s <b>not</b> just you. The site is <b>down!</b></p>';
+                }
+            });
         }
     });
 
