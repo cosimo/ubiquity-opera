@@ -1432,6 +1432,27 @@
     });
 
     CmdUtils.CreateCommand({
+        name: "currency-converter",
+        takes: {"currency_spec": noun_arb_text},
+        description: "Convert currency using xe.com converter service.<br/><i>Ex.: 5000 NOK to EUR</i>",
+        author: { name: "Cosimo Streppone", email: "cosimo@cpan.org" },
+        icon: "http://www.xe.com/favicon.ico",
+        homepage: "http://xe.com/ucc/",
+        license: "",
+        preview: "Convert currency values using xe.com converter service.",
+        execute: function( directObj ) {
+            var currency_spec = directObj.text;
+            var matches = currency_spec.match(/^([\d\.]+)\s+(\w+)\s+to\s+(\w+)$/);
+            var amount = matches[1];
+            var curr_from = matches[2].toUpperCase();
+            var curr_to = matches[3].toUpperCase();
+            var xe_url = "http://www.xe.com/ucc/convert.cgi?Amount=" + escape(amount)
+                + "&From=" + escape(curr_from) + "&To=" + escape(curr_to);
+            Utils.openUrlInBrowser(xe_url);
+        }
+    });
+
+    CmdUtils.CreateCommand({
       name: "dictionary",
       description: "Gives the meaning of a word.",
       author: { name: "Isidoros Passadis", email: "isidoros.passadis@gmail.com"},
@@ -1570,6 +1591,58 @@
         execute: CmdUtils.SimpleUrlBasedCommand(
             "http://instantrimshot.com/rimshot.swf"
         )
+    });
+
+    //
+    // From Ubiquity feed:
+    // https://ubiquity.mozilla.com/herd/all-feeds/9b0b1de981e80b6fcfee0659ffdbb478d9abc317-4742/
+    //
+    // Modified to get the current window domain
+    //
+    CmdUtils.CreateCommand({
+        name: "isdown",
+        icon: "http://downforeveryoneorjustme.com/favicon.ico",
+        description: "Check if selected/typed URL is down",
+        homepage: "http://www.andyfilms.net",
+        author: { name: "Andy Jarosz", email: "andyfilms1@yahoo.com"},
+        license: "GPL",
+        takes: {URL: noun_arb_text},
+        preview: function(pblock, directObject) {
+            //ubiq_show_preview(urlString);
+            //searchText = jQuery.trim(directObject.text);
+            searchText = directObject.text;
+            var words = searchText.split(' ');
+            var host = words[1];
+            if(searchText.length < 1) {
+                pblock.innerHTML = "Checks if URL is down";
+                return;
+            }
+            var previewTemplate = "Checks if <b>" + host + "</b> is down";
+            pblock.innerHTML = previewTemplate;
+        },
+        execute: function(directObject) {
+            var url = "http://downforeveryoneorjustme.com/{QUERY}"
+            var query = directObject.text;
+            // Get the hostname from url
+            if (! query) {
+                var host = window.location.href;
+                var url_comp = host.split('/');
+                query = url_comp[2];
+            }
+            var urlString = url.replace("{QUERY}", query);
+            //Utils.openUrlInBrowser(urlString);
+            ubiq_xml_http(urlString, function (ajax) {
+                if (! ajax) return;
+                var text = ajax.responseText;
+                if (! text) return;
+                var pblock = document.getElementById('ubiq-command-preview');
+                if (text.match('is up.')) {
+                    pblock.innerHTML = '<br/><p style="font-size: 18px;">It\'s just you. The site is <b>up!</b></p>';
+                } else {
+                    pblock.innerHTML = '<br/><p style="font-size: 18px;">It\'s <b>not</b> just you. The site is <b>down!</b></p>';
+                }
+            });
+        }
     });
 
     CmdUtils.CreateCommand({
@@ -1927,58 +2000,6 @@
         execute: CmdUtils.SimpleUrlBasedCommand(
             "http://www.youtube.com/results?search_type=search_videos&search_sort=relevance&search_query={text}&search=Search"
         )
-    });
-
-    //
-    // From Ubiquity feed:
-    // https://ubiquity.mozilla.com/herd/all-feeds/9b0b1de981e80b6fcfee0659ffdbb478d9abc317-4742/
-    //
-    // Modified to get the current window domain
-    //
-    CmdUtils.CreateCommand({
-        name: "isdown",
-        icon: "http://downforeveryoneorjustme.com/favicon.ico",
-        description: "Check if selected/typed URL is down",
-        homepage: "http://www.andyfilms.net",
-        author: { name: "Andy Jarosz", email: "andyfilms1@yahoo.com"},
-        license: "GPL",
-        takes: {URL: noun_arb_text},
-        preview: function(pblock, directObject) {
-            //ubiq_show_preview(urlString);
-            //searchText = jQuery.trim(directObject.text);
-            searchText = directObject.text;
-            var words = searchText.split(' ');
-            var host = words[1];
-            if(searchText.length < 1) {
-                pblock.innerHTML = "Checks if URL is down";
-                return;
-            }
-            var previewTemplate = "Checks if <b>" + host + "</b> is down";
-            pblock.innerHTML = previewTemplate;
-        },
-        execute: function(directObject) {
-            var url = "http://downforeveryoneorjustme.com/{QUERY}"
-            var query = directObject.text;
-            // Get the hostname from url
-            if (! query) {
-                var host = window.location.href;
-                var url_comp = host.split('/');
-                query = url_comp[2];
-            }
-            var urlString = url.replace("{QUERY}", query);
-            //Utils.openUrlInBrowser(urlString);
-            ubiq_xml_http(urlString, function (ajax) {
-                if (! ajax) return;
-                var text = ajax.responseText;
-                if (! text) return;
-                var pblock = document.getElementById('ubiq-command-preview');
-                if (text.match('is up.')) {
-                    pblock.innerHTML = '<br/><p style="font-size: 18px;">It\'s just you. The site is <b>up!</b></p>';
-                } else {
-                    pblock.innerHTML = '<br/><p style="font-size: 18px;">It\'s <b>not</b> just you. The site is <b>down!</b></p>';
-                }
-            });
-        }
     });
 
     // Add event handler to window 
