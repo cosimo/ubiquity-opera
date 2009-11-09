@@ -855,7 +855,7 @@
         var wnd = document.createElement('div');
         var stl = wnd.style;
         wnd.setAttribute('id', 'ubiq_window');
-        stl.position='absolute';
+        stl.position='fixed';
         stl.left=1;
         stl.top=1;
         stl.visibility='hidden';
