@@ -811,7 +811,7 @@
     CmdUtils.toggleUbiquityWindow = function toggleUbiquityWindow (w) {
         if (!w) w = ubiq_window;
         var vis = w.style.visibility;
-        if (vis=='hidden') vis='visible' else vis='hidden';
+        vis = (vis=='hidden') ? 'visible' : 'hidden';
         w.style.visibility=vis;
         return;
     }
@@ -1013,7 +1013,7 @@
     function ubiq_toggle_window (w) {
         if (!w) return;
         var vis = w.style.visibility;
-        if (vis=='hidden') vis='visible' else vis='hidden';
+        vis = (vis=='hidden') ? 'visible' : 'hidden';
         w.style.visibility=vis;
         return;
     }

@@ -20,7 +20,11 @@ To use this in Opera, you have to:
   since the original Ubiquity is activated and deactivated
   with CTRL + SPACE.
 
-Have fun!
+- Copy ubiquity.js (or the minified version, ubiquity-min.js)
+  in your User Javascript folder. Restart the browser,
+  and...
+
+have fun!
 
 ----------------------------------------------
 Cosimo Streppone, <cosimo@cpan.org>
