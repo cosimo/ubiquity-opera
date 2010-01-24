@@ -1818,6 +1818,60 @@
         )
     });
 
+    var bitly_api_user = "ubiquityopera";
+    var bitly_api_key = "R_59da9e09c96797371d258f102a690eab";
+    CmdUtils.CreateCommand({
+        name: "shorten-url",
+        icon: "http://bit.ly/static/images/favicon.ico",
+        description: "Shorten your URLs with the least possible keystrokes",
+        homepage: "http://bit.ly",
+        author: {name: "Cosimo Streppone", email: "cosimo@cpan.org"},
+        license: "GPL",
+        takes: {URL: noun_arb_text},
+        preview: function(pblock, directObject) {
+            var searchText = directObject.text;
+            var words = searchText.split(' ');
+            var host = words[1];
+            if(searchText.length < 1) {
+                pblock.innerHTML = "Shortens an URL (or the current tab) with bit.ly";
+                return;
+            }
+            var previewTemplate = "Shortens the URL '" + host + "' with bit.ly";
+            pblock.innerHTML = previewTemplate;
+        },
+        execute: function(directObject) {
+            var url = "http://api.bit.ly/shorten?version=2.0.1&longUrl={QUERY}&login="
+                + bitly_api_user + "&apiKey=" + bitly_api_key;
+            var query = directObject.text;
+            // Get the url from current open tab if none specified
+            if (! query || query == "") query = window.location.href;
+            var urlString = url.replace("{QUERY}", query);
+            ubiq_xml_http(urlString, function (ajax) {
+
+                if (! ajax) return;
+                var api_response = ajax.responseText;
+                if (! api_response) return;
+
+                var pblock = document.getElementById('ubiq-command-preview');
+                var err_code = api_response.errorCode;
+                var err_msg = api_response.errorMessage;
+                // Received an error from bit.ly API?
+                if (err_code > 0 || err_msg) {
+                    pblock.innerHTML = '<br/><p style="font-size: 18px; color:orange">'
+                        + 'Bit.ly API error ' + err_code + ': ' + err_msg + '</p>';
+                    return;
+                }
+
+                // API successful. URL has been shortened
+                eval('api_response='+api_response);
+                var short_url = api_response.results[query].shortUrl;
+                pblock.innerHTML = '<br/><p style="font-size: 24px; font-weight: bold; color: #ddf">'
+                    + '&rarr; <a href="' + short_url + '">' + short_url + '</a>'
+                    + '</p>';
+            });
+        }
+    });
+
     CmdUtils.CreateCommand({
       name: "slideshare",
       icon: "http://www.slideshare.com/favicon.ico",
