@@ -1,9 +1,21 @@
-----------------------------------------------
+= Ubiquity for Opera =
+
 An attempt to rewrite Firefox's Ubiquity extension
 for Opera using UserJS.
-----------------------------------------------
 
-Original Ubiquity Project: http://labs.mozilla.org/ubiquity/
+== Blog ==
+
+http://my.opera.com/cstrep/blog/show.dml/tag/ubiquity
+
+== Source code ==
+
+http://github.com/cosimo/ubiquity-opera/
+
+== Original Ubiquity project ==
+
+http://labs.mozilla.org/ubiquity/
+
+== Instructions ==
 
 To use this in Opera, you have to:
 
@@ -24,9 +36,8 @@ To use this in Opera, you have to:
   in your User Javascript folder. Restart the browser,
   and...
 
-have fun!
+Have fun!
 
-----------------------------------------------
 Cosimo Streppone, <cosimo@cpan.org>
 First version: 19/01/2009
 

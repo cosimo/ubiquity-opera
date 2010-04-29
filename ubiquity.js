@@ -1,5 +1,6 @@
 //
 // Ubiquity for Opera? A nightly experiment...
+// http://github.com/cosimo/ubiquity-opera/
 // -------------------------------------------
 //
 // An attempt to rewrite Firefox's Ubiquity extension
@@ -32,8 +33,6 @@
 // Includes a-lib-stacktrace.js and a-lib-xmlhttp-cd.js
 // Copyright © 2007 by João Eiras.
 // ----------------------------------------------
-//
-// $Id$
 
 ;
 
