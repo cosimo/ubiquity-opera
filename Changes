@@ -1,5 +1,9 @@
 Ubiquity for Opera - List of changes
 
+2010-04-29
+    - Fixed ubiq_focus() function to work in Opera 10.5+
+    - Added the ESC key binding, to hide the Ubiquity window
+
 2010-01-24
     - Added the "shorten-url" command. Uses bit.ly API
     - Added the minified version, ubiquity-min.js

@@ -1011,18 +1011,26 @@
     }
 
     function ubiq_toggle_window (w) {
-        if (!w) return;
+        if (!w) w = ubiq_window;
         var vis = w.style.visibility;
         vis = (vis=='hidden') ? 'visible' : 'hidden';
         w.style.visibility=vis;
         return;
     }
 
-    function ubiq_focus (w) {
-        var line=document.getElementById('ubiq_input');
-        // Pre-select the input content if there's any
-        if (line.value != '') line.createTextRange().select();
-        line.focus();
+    function ubiq_focus() {
+      line = 'ubiq_input';
+      el=document.getElementById(line);
+      if(el.createTextRange){
+        var oRange=el.createTextRange();
+        oRange.moveStart("character", 0);
+        oRange.moveEnd("character", el.value.length);
+        oRange.select();
+      }
+      else if (el.setSelectionRange){
+        el.setSelectionRange(0, el.value.length);
+      }
+      el.focus();
     }
 
     function ubiq_enabled () {
@@ -1210,15 +1218,15 @@
                 // Get text selection before switching window focus
                 ubiq_get_selection();
                 ubiq_get_current_element();
-                ubiq_toggle_window(ubiq_window);
-                ubiq_focus(ubiq_window);
+                ubiq_toggle_window();
+                ubiq_focus();
             }
         }
 
         else {
 
             if (ctrl_space_pressed) {
-                ubiq_toggle_window(ubiq_window);
+                ubiq_toggle_window();
                 return;
             }
 
@@ -1226,6 +1234,11 @@
             if (kc==13) {
                 ubiq_execute();
                 return;
+            }
+
+            // ESC, hide the Ubiquity window
+            if (kc==27) {
+                ubiq_toggle_window();
             }
 
             // Cursor up
