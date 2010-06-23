@@ -1,6 +1,3 @@
-TODO
-====
-
 * Due to limitations of UserJS, I can't access
   Opera preferences and search engines, so I can't
   autogenerate the searches commands for all your
@@ -17,11 +14,4 @@ TODO
 * If there's more commands than the current window
   can display, they are now truncated, there's no
   possibility to scroll down...
-
-DONE
-====
-
-* It's not possible to load scripts or JSON content
-  from other sites, due to XSS restrictions
-
 
