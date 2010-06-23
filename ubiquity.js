@@ -1347,6 +1347,20 @@
     });
 
     CmdUtils.CreateCommand({
+        name: "bing",
+        takes: {"expr": noun_arb_text},
+        description: "Search the web with Microsoft Bing",
+        author: {},
+        icon: "http://www.bing.com/favicon.ico",
+        homepage: "",
+        license: "",
+        preview: "Search the web with Microsoft Bing",
+        execute: CmdUtils.SimpleUrlBasedCommand(
+            "http://www.bing.com/search?q={text}&form=OPRTSD&pc=OPER"
+        )
+    });
+
+    CmdUtils.CreateCommand({
         name: "bugzilla",
         takes: {"search_string": noun_arb_text},
         description: "Perform a bugzilla search for",

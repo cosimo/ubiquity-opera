@@ -1,9 +1,13 @@
 Ubiquity for Opera - List of changes
 
+2010-06-24
+    - Added the "bing" command to search with www.bing.com
+
 2010-01-24
     - Added the "shorten-url" command. Uses bit.ly API
     - Added the minified version, ubiquity-min.js
 
 The rest of the history is not tracked.
-See http://my.opera.com/cstrep/blog/
+
+See http://my.opera.com/cstrep/blog/show.dml/tag/ubiquity
 

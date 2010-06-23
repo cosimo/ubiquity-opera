@@ -1,4 +1,5 @@
-$Id$
+TODO
+====
 
 * Due to limitations of UserJS, I can't access
   Opera preferences and search engines, so I can't
@@ -10,13 +11,17 @@ $Id$
   This leads to multiple ubiquity windows, one for each
   document, that don't share their state
 
-* It's not possible to load scripts or JSON content
-  from other sites, due to XSS restrictions
-
 * Current css style of elements in the ubiquity window
   is influenced by css of the underlying page.
 
 * If there's more commands than the current window
   can display, they are now truncated, there's no
   possibility to scroll down...
+
+DONE
+====
+
+* It's not possible to load scripts or JSON content
+  from other sites, due to XSS restrictions
+
 
