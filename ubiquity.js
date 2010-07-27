@@ -1522,6 +1522,16 @@
     });
 
     CmdUtils.CreateCommand({
+        name: "fizy",
+        icon: "http://www.fizy.com/favicon.ico",
+        description: "Search Music and Video",
+        preview: "Search Music and Video on fizy.com:",
+        execute: CmdUtils.SimpleUrlBasedCommand(
+            "http://fizy.com/?q={text}&type=&quality=&duration=&x=0&y=0"
+        )
+    });
+
+    CmdUtils.CreateCommand({
         name: "flickr",
         takes: {"search_string": noun_arb_text},
         description: "Search photos on Flickr",
@@ -1616,6 +1626,20 @@
         preview: "Instant Rimshot at your fingertips!",
         execute: CmdUtils.SimpleUrlBasedCommand(
             "http://instantrimshot.com/rimshot.swf"
+        )
+    });
+
+    CmdUtils.CreateCommand({
+        name: "icon",
+        takes: {"search_string": noun_arb_text},
+        description: "Icon Search:",
+        author: {},
+        icon: "http://www.iconfinder.com/favicon.ico",
+        homepage: "",
+        license: "",
+        preview: "Search Icons:",
+        execute: CmdUtils.SimpleUrlBasedCommand(
+            'http://www.iconfinder.com/search/?q={text}'
         )
     });
 
@@ -1831,6 +1855,16 @@
     });
 
     CmdUtils.CreateCommand({
+        name: "scan",
+        icon: "http://safeweb.norton.com/favicon.ico",
+        description: "Scan site with Norton Safeweb",
+        preview: "Scan site with Norton Safeweb:",
+        execute: CmdUtils.SimpleUrlBasedCommand(
+            "http://safeweb.norton.com/report/show?url={location}&x=0&y=0"
+        )
+    });
+
+    CmdUtils.CreateCommand({
         name: "search",
         takes: {"search_string": noun_arb_text},
         description: "Search on Google for the given words",
@@ -2023,6 +2057,16 @@
         preview: "Show the weather forecast for",
         execute: CmdUtils.SimpleUrlBasedCommand(
             "http://www.wunderground.com/cgi-bin/findweather/getForecast?query={text}"
+        )
+    });
+
+    CmdUtils.CreateCommand({
+        name: "whois",
+        icon: "http://www.who.is/favicon.ico",
+        description: "Who.is",
+        preview: "Whois query on who.is:",
+        execute: CmdUtils.SimpleUrlBasedCommand(
+            "http://who.is/whois/{location}"
         )
     });
 
