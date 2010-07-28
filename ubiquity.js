@@ -1630,14 +1630,14 @@
     });
 
     CmdUtils.CreateCommand({
-        name: "icon",
+        name: "icon-search",
         takes: {"search_string": noun_arb_text},
-        description: "Icon Search:",
+        description: "IconFinder icon search:",
         author: {},
-        icon: "http://www.iconfinder.com/favicon.ico",
+        icon: "http://cdn.iconfinder.net/design/images/favicon.ico",
         homepage: "",
         license: "",
-        preview: "Search Icons:",
+        preview: "",
         execute: CmdUtils.SimpleUrlBasedCommand(
             'http://www.iconfinder.com/search/?q={text}'
         )
@@ -2063,10 +2063,10 @@
     CmdUtils.CreateCommand({
         name: "whois",
         icon: "http://www.who.is/favicon.ico",
-        description: "Who.is",
+        description: "Query a domain name owner",
         preview: "Whois query on who.is:",
         execute: CmdUtils.SimpleUrlBasedCommand(
-            "http://who.is/whois/{location}"
+            "http://who.is/whois/{text}"
         )
     });
 
