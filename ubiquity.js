@@ -1508,6 +1508,20 @@
     });
             
     CmdUtils.CreateCommand({
+        name: "duckduckgo",
+        takes: {"search_string": noun_arb_text},
+        description: "Search on DuckDuckGo for the given words",
+        author: {},
+        icon: "http://duckduckgo.com/favicon.ico",
+        homepage: "http://duckduckgo.com",
+        license: "",
+        preview: "Search on DuckDuckGo for the given words",
+        execute: CmdUtils.SimpleUrlBasedCommand(
+            "http://duckduckgo.com/?client=opera&q={text}&sourceid=opera&ie=utf-8&oe=utf-8"
+        )
+    });
+
+    CmdUtils.CreateCommand({
         name: "ebay-search",
         takes: {"search_string": noun_arb_text},
         description: "Search ebay for the given words",
@@ -1569,7 +1583,7 @@
         license: "",
         preview: "Search on Google for the given words",
         execute: CmdUtils.SimpleUrlBasedCommand(
-            "http://www.google.com/search?client=opera&num=1&q={text}&sourceid=opera&ie=utf-8&oe=utf-8"
+            "http://www.google.com/search?client=opera&q={text}&sourceid=opera&ie=utf-8&oe=utf-8"
         )
     });
 
@@ -1874,7 +1888,7 @@
         license: "",
         preview: "Search on Google for the given words",
         execute: CmdUtils.SimpleUrlBasedCommand(
-            "http://www.google.com/search?client=opera&num=1&q={text}&sourceid=opera&ie=utf-8&oe=utf-8"
+            "http://www.google.com/search?client=opera&q={text}&sourceid=opera&ie=utf-8&oe=utf-8"
         )
     });
 
