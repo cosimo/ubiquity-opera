@@ -1,5 +1,9 @@
 Ubiquity for Opera - List of changes
 
+2010-09-14
+    - Added "duckduckgo" command to search on duckduckgo.com
+    - Fixed a bug in the Google default search command
+
 2010-06-24
     - Added the "bing" command to search with www.bing.com
 
