@@ -1,0 +1,6 @@
+<?xml version='1.0' encoding='utf-8'?>
+<widget xmlns="http://www.w3.org/ns/widgets" id="extensions:ubiquity">
+  <name>Ubiquity</name>
+  <description>Port of FF Ubiquity to Opera. Help: http://people.opera.com/cosimo/ubiquity/help.html</description>
+  <author href="http://my.opera.com/cstrep/">Cosimo Streppone (@cstrep)</author>
+</widget>

@@ -1,0 +1,57 @@
+= Ubiquity for Opera, the Extension =
+
+An attempt to rewrite Firefox's Ubiquity extension
+for Opera using Extensions.
+
+== Help ==
+
+http://people.opera.com/cosimo/ubiquity/help.html
+
+== How to use ==
+
+The first time you install the extension, it should
+open a help window, if your popup blocker doesn't
+block it...
+
+Then, open a new tab, say "http://www.opera.com",
+and press "CTRL + SHIFT + U", and start typing a command.
+
+The default shortcut sucks.
+The problem is that CTRL + space, the default Ubiquity
+shortcut, in Opera is already assigned to the
+homepage.
+
+I couldn't find a way to override that in the extension,
+and I didn't want people to *have* to fiddle with it
+to use the extension, so... CTRL + SHIFT + U it is.
+
+== Commands ==
+
+There's many. You can see them as you type.
+
+To search for Videos on YouTube, for example,
+type "youtube <search-term>", as in "youtube dramatic chipmunk".
+Press ENTER, and you will see the results.
+
+== Problems ==
+
+The Ubiquity popup window doesn't open on some sites.
+This was acknowledged as a bug in Opera, but I'm not sure.
+
+== Improvements ==
+
+This thing can be improved a lot of course,
+but I didn't have time...
+
+* Implement a preferences popup/window, so one can choose
+  the shortcut, theme, or other settings.
+
+* Place the Ubiquity popup window under the location bar, if
+  it's even possible
+
+* Make sure that Ubiquity extension can access preferences,
+  searches, and so on. That would be massively useful.
+
+--
+Cosimo, 18/Oct/2010
+
