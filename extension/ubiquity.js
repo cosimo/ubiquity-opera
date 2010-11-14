@@ -1270,7 +1270,7 @@
             //var html = ubiq_element.innerHTML.replace(text, 'blah blah blah');
             //ubiq_element.innerHTML = html;
             var words = text.split(/\s+/);
-            var dest = 'auto';
+            var dest = 'en';
 
             // Detect the destination language ("translate ... to it")
             if (words.length >= 3 && words[words.length - 2].toLowerCase()=='to') {
